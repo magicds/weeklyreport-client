@@ -1,0 +1,387 @@
+<template>
+  <div class="person-input">
+    <Alert>
+      <p>请大家每周五下班前按要求填写周报，若每月有3次未按要求填写周报，考虑月浮动奖罚，以做规范手段。</p>
+      <p>周报的目的：</p>
+      <ol class="weekly-aims">
+        <li>
+          <p>对自己本周工作进行一个如实总结。</p>
+        </li>
+        <li>
+          <p>方便部门管理者、各小组负责人了解团队的整体运行情况。</p>
+        </li>
+      </ol>
+      <p>请大家跳出自我的角度，多从管理者的角度、团队的角度考虑问题，就能理解其中的必要性。</p>
+    </Alert>
+    <i-form :model="data" :rules="relues" label-position="top" ref="form">
+      <fieldset v-if="user.dept && user.name">
+        <legend>基本信息</legend>
+        <div>{{user.dept.name || ''}} - {{user.group.name || ''}} - {{user.name}}</div>
+      </fieldset>
+      <fieldset>
+        <legend>工作内容</legend>
+
+        <FormItem label="类型" style="margin-top:10px; margin-bottom:0px;">
+          <RadioGroup v-model="type">
+            <Radio :key="item.key" :label="item.key" v-for="item in types">
+              <span>{{item.text}}</span>
+            </Radio>
+          </RadioGroup>
+        </FormItem>
+
+        <div class="type-info">
+          <ul>
+            <li :class="item.key == type ? 'light' : ''" :key="item.key" v-for="item in types">{{item.text}}：{{item.info}}</li>
+          </ul>
+        </div>
+
+        <!-- <div class="title">{{currType.text}}</div> -->
+        <FormItem :label="currType.text" prop="content">
+          <i-input :rows="4" element-id="content-input" placeholder="请输入内容，回车将被自动分割为多条" type="textarea" v-model="data.content"></i-input>
+        </FormItem>
+
+        <div class="content-info">{{currType.explain}}</div>
+
+        <FormItem :label="timeLabel.title" prop="time">
+          <InputNumber :max="100" :min="0.1" :step="1" v-model="data.time"></InputNumber>
+        </FormItem>
+
+        <Button @click="addItem" type="primary">添加并重置</Button>
+      </fieldset>
+
+      <fieldset>
+        <legend>事项列表</legend>
+        <i-table :columns="tableColumns" :data="reportList"></i-table>
+      </fieldset>
+
+      <fieldset>
+        <legend>汇总</legend>
+
+        <table class="table table-bordered vertical-middle">
+          <thead>
+            <tr>
+              <th>姓名</th>
+              <th>工作内容</th>
+              <th>任务耗时</th>
+              <th>学习耗时</th>
+              <th>沟通耗时</th>
+              <th>其他</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{user.name || ''}}</td>
+              <td>
+                <ul>
+                  <li :key="item.id" v-for="item in workList">
+                    {{item.content}}
+                    <span v-if="item.showTime">（{{item.time}}小时）</span>
+                  </li>
+                </ul>
+              </td>
+              <td>{{taskTime | toInt}}</td>
+              <td>{{studyTime | toInt}}</td>
+              <td>{{communicationTime | toInt}}</td>
+              <td>
+                <ul v-if="leaveList.length">
+                  <li :key="item.id" v-for="item in leaveList">
+                    {{item.content}}
+                    <span v-if="item.showTime">（{{item.time}}小时）</span>
+                  </li>
+                </ul>
+                <span v-else>无</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <Button :disabled="reportList.length < 1" :loading="isSaving" @click="addToCloud" type="primary">提交到云端</Button>
+      </fieldset>
+    </i-form>
+  </div>
+</template>
+
+<script>
+const config = {
+  // 类型分类
+  types: [
+    {
+      key: "task",
+      text: "实际任务",
+      title: "任务描述",
+      info:
+        "能够获取到外部预算的开发任务，任务跟进过程中的沟通工作也包括在内。",
+      explain:
+        "请填写任务名称，并简要说明任务的进展情况，如存在风险，请一并说明。如：招投标大数据平台页面开发，涉及大量图表，部分页面需求还在变更，确定的已完成80%，暂无风险。"
+    },
+    {
+      key: "communication",
+      text: "沟通管理",
+      info:
+        "主要针对团队内部的沟通管理工作，包括：工作督导、人员安排、代码评审等。",
+      title: "沟通内容",
+      explain:
+        "请填写沟通内容，如：评审某某的代码，形成评审纪要，并沟通明确整改。"
+    },
+    {
+      key: "study",
+      text: "学习研究",
+      info:
+        "在自身工作有余力的情况下，进行的自我学习和技术研究，也包括新人的练习与学习。",
+      title: "学习内容",
+      explain: "请填写学习内容，如：学习handlebars模版引擎，并进行实践。"
+    },
+    {
+      key: "leave",
+      text: "请假调休",
+      info: "能确有急事请假 或者 正常调休。",
+      title: "请假说明",
+      explain:
+        "请如实填写请假缘由，如：近期加班较多，目前手头任务可控，调休一天，自我调节。"
+    }
+  ],
+  // 默认的类型
+  defaultType: "task",
+  // 时间描述说明
+  time: {
+    title: "所花时间",
+    info: "不要求完全精确，分秒不差，但尽可能客观，不要虚报注水。",
+    explain: "请填写该事项所花费的时间，如果周末有加班时间，可以预先填报。"
+  },
+  // 每周基准工作时间
+  fullTime: 40,
+  // 计算为任务饱和度的工作类型 值为类型配置中的key
+  saturationTyps: ["task", "communication"]
+};
+
+// 从输入的内容中分隔出多条
+function getItems(content) {
+  let items = content.split(/\n|\r|\r\n/);
+  for (var i = items.length - 1; i > 0; --i) {
+    if (items[i].trim() === "") {
+      items.splice(i, 1);
+    }
+  }
+  return items;
+}
+
+// 自动生成一个id
+let listIndex = 1;
+function getIndex() {
+  return "list-" + listIndex++;
+}
+
+export default {
+  data() {
+    return {
+      type: config.defaultType,
+      types: config.types,
+      timeLabel: config.time,
+      user: {},
+      data: {
+        content: "",
+        time: 0
+      },
+      taskList: [],
+      studyList: [],
+      communicationList: [],
+      leaveList: [],
+      relues: {
+        content: [
+          {
+            required: true,
+            message: "请输入任务描述",
+            trigger: "blur"
+          }
+        ],
+        time: [
+          {
+            required: true,
+            type: "number",
+            message: "必须输入花费时间",
+            trigger: "blur",
+            min: 0.1
+          }
+        ]
+      },
+      tableColumns: [
+        {
+          title: "工作内容",
+          key: "content"
+        },
+        {
+          title: "类型",
+          key: "typeText"
+        },
+        {
+          title: "时间",
+          key: "time",
+          render: (h, params) => {
+            if (params.row.showTime) {
+              return h("span", params.row.time);
+            } else {
+              return h("span", "--");
+            }
+          }
+        },
+        {
+          title: "操作",
+          render: (h, params) => {
+            return h("div", [
+              h(
+                "a",
+                {
+                  props: {
+                    type: "normal",
+                    size: "small"
+                  },
+                  style: {
+                    marginRight: "5px"
+                  },
+                  on: {
+                    click: () => {
+                      this.editItem(params.row, params.index);
+                    }
+                  }
+                },
+                "编辑"
+              ),
+              h(
+                "a",
+                {
+                  props: {
+                    type: "danger",
+                    size: "small"
+                  },
+                  on: {
+                    click: () => {
+                      this.deleteItem(params.row, params.index);
+                    }
+                  }
+                },
+                "删除"
+              )
+            ]);
+          }
+        }
+      ],
+      isSaving: false
+    };
+  },
+  computed: {
+    currType() {
+      return this.types.filter(item => item.key === this.type)[0];
+    },
+    taskTime() {
+      let time = 0;
+      this.taskList.forEach(task => {
+        time += task.time;
+      });
+      return time;
+    },
+    studyTime() {
+      let time = 0;
+      this.studyList.forEach(study => {
+        time += study.time;
+      });
+      return time;
+    },
+    communicationTime() {
+      let time = 0;
+      this.communicationList.forEach(communication => {
+        time += communication.time;
+      });
+      return time;
+    },
+    leaveTime() {
+      let time = 0;
+      this.leaveList.forEach(leave => {
+        time += leave.time;
+      });
+      return time;
+    },
+    workList() {
+      return this.taskList.concat(this.studyList, this.communicationList);
+    },
+    reportList() {
+      return this.workList.concat(this.leaveList);
+    }
+  },
+  watch: {
+    currType() {
+      this.relues.content[0].message = "请输入" + this.currType.title;
+      this.$refs.form.validate();
+    }
+  },
+  methods: {
+    getData() {
+      
+    },
+    addItem() {
+      this.$refs.form.validate(isValidated => {
+        // 验证通过才处理
+        if (isValidated) {
+          let items = getItems(this.data.content);
+          let length = items.length;
+          let showTime = length > 1 ? false : true;
+
+          items.forEach(item => {
+            this[this.currType.key + "List"].push({
+              id: getIndex(),
+              type: this.currType.key,
+              typeText: this.currType.text,
+              content: item,
+              showTime,
+              time: parseFloat(this.data.time / length)
+            });
+          });
+
+          this.data.content = "";
+          this.data.time = 0;
+        }
+      });
+    },
+    deleteItem(row, index) {
+      this[row.type + "List"].splice(index, 1);
+    },
+    editItem(row, index) {
+      if (this.data.content.trim() || this.data.time) {
+        this.$Message.warning("请先处理当前正在输入的内容");
+        return;
+      }
+
+      let currData = this[row.type + "List"].splice(index, 1)[0];
+
+      console.log(currData);
+      this.type = currData.type;
+      this.data.content = currData.content;
+      this.data.time = currData.time;
+    },
+    addToCloud() {
+      this.isSaving = true;
+
+      // api
+      //   .addReprot({
+      //     workList: this.workList,
+      //     leaveList: this.leaveList,
+      //     studyTime: this.studyTime,
+      //     taskTime: this.taskTime,
+      //     communicationTime: this.communicationTime,
+      //     leaveTime: this.leaveTime,
+      //     saturation: (this.taskTime + this.communicationTime) / 40
+      //   })
+      //   .then(savedData => {
+      //     console.log(savedData);
+      //     this.isSaving = false;
+      //     this.showSuccessTips();
+      //   });
+    },
+    showSuccessTips() {
+      this.$Message.success("提交成功");
+    }
+  }
+};
+</script>
+
+<style>
+</style>
