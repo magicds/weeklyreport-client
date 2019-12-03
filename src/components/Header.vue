@@ -5,12 +5,12 @@
       <router-link :to="{ name: 'summary'}" class="nav-link">周报汇总</router-link>
     </div>
 
-    <UserIcon class="header-user-icon" :name="'xxx'" :ext-items="[]" />
+    <UserIcon class="header-user-icon" :data="user" :ext-items="[]" />
   </nav>
 </template>
 
 <script>
-import UserIcon from "./UserIcon";
+import UserIcon from "./UserIcon.vue";
 export default {
   name: "header-nav",
   components: {
@@ -18,8 +18,13 @@ export default {
   },
   data() {
     return {
-      user: {}
+      
     };
+  },
+  computed:{
+    user() {
+      return this.$store.state.userData
+    }
   }
 };
 </script>
