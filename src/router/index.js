@@ -1,8 +1,12 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
+import Login from "../views/Login.vue";
+import Signup from "../views/Signup.vue";
+import ResetPwd from "../views/ResetPwd.vue";
 import Main from "../views/Main.vue";
 import Input from "../views/Input.vue";
+import Summary from "../views/Summary.vue";
 
 Vue.use(VueRouter);
 
@@ -15,17 +19,17 @@ const routes = [
   {
     path: "/login",
     name: "login",
-    component: Home
+    component: Login
   },
   {
     path: "/signup",
     name: "signup",
-    component: Home
+    component: Signup
   },
   {
-    path: "/resetPwd",
+    path: "/resetpwd",
     name: "resetPwd",
-    component: Home
+    component: ResetPwd
   },
   {
     path: "/main",
@@ -36,12 +40,12 @@ const routes = [
         path: "input",
         name: "input",
         component: Input
+      },
+      {
+        path:'summary',
+        name:'summary',
+        component: Summary
       }
-      // {
-      //   path:'summary',
-      //   name:'summary',
-      //   component: Summary
-      // }
       // ,
       // {
       //   path:'dept',

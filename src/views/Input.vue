@@ -1,6 +1,6 @@
 <template>
   <div class="person-input">
-    <Alert>
+    <Alert type="error">
       <p>请大家每周五下班前按要求填写周报，若每月有3次未按要求填写周报，考虑月浮动奖罚，以做规范手段。</p>
       <p>周报的目的：</p>
       <ol class="weekly-aims">
@@ -13,11 +13,14 @@
       </ol>
       <p>请大家跳出自我的角度，多从管理者的角度、团队的角度考虑问题，就能理解其中的必要性。</p>
     </Alert>
+
+    <fieldset v-if="user.name">
+      <legend>基本信息</legend>
+      <div>{{user.dept.name || ''}} - {{user.group.name || ''}} - {{user.name}}</div>
+      <p>{{dateRangeText}}</p>
+    </fieldset>
+
     <i-form :model="data" :rules="relues" label-position="top" ref="form">
-      <fieldset v-if="user.dept && user.name">
-        <legend>基本信息</legend>
-        <div>{{user.dept.name || ''}} - {{user.group.name || ''}} - {{user.name}}</div>
-      </fieldset>
       <fieldset>
         <legend>工作内容</legend>
 
@@ -29,11 +32,11 @@
           </RadioGroup>
         </FormItem>
 
-        <div class="type-info">
+        <alert class="type-info">
           <ul>
             <li :class="item.key == type ? 'light' : ''" :key="item.key" v-for="item in types">{{item.text}}：{{item.info}}</li>
           </ul>
-        </div>
+        </alert>
 
         <!-- <div class="title">{{currType.text}}</div> -->
         <FormItem :label="currType.text" prop="content">
@@ -43,61 +46,61 @@
         <div class="content-info">{{currType.explain}}</div>
 
         <FormItem :label="timeLabel.title" prop="time">
-          <InputNumber :max="100" :min="0.1" :step="1" v-model="data.time"></InputNumber>
+          <InputNumber :max="100" :min="0.1" :step="1" v-model="data.time" style="width:100%"></InputNumber>
         </FormItem>
 
         <Button @click="addItem" type="primary">添加并重置</Button>
       </fieldset>
-
-      <fieldset>
-        <legend>事项列表</legend>
-        <i-table :columns="tableColumns" :data="reportList"></i-table>
-      </fieldset>
-
-      <fieldset>
-        <legend>汇总</legend>
-
-        <table class="table table-bordered vertical-middle">
-          <thead>
-            <tr>
-              <th>姓名</th>
-              <th>工作内容</th>
-              <th>任务耗时</th>
-              <th>学习耗时</th>
-              <th>沟通耗时</th>
-              <th>其他</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{user.name || ''}}</td>
-              <td>
-                <ul>
-                  <li :key="item.id" v-for="item in workList">
-                    {{item.content}}
-                    <span v-if="item.showTime">（{{item.time}}小时）</span>
-                  </li>
-                </ul>
-              </td>
-              <td>{{taskTime | toInt}}</td>
-              <td>{{studyTime | toInt}}</td>
-              <td>{{communicationTime | toInt}}</td>
-              <td>
-                <ul v-if="leaveList.length">
-                  <li :key="item.id" v-for="item in leaveList">
-                    {{item.content}}
-                    <span v-if="item.showTime">（{{item.time}}小时）</span>
-                  </li>
-                </ul>
-                <span v-else>无</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <Button :disabled="reportList.length < 1" :loading="isSaving" @click="addToCloud" type="primary">提交到云端</Button>
-      </fieldset>
     </i-form>
+
+    <fieldset>
+      <legend>事项列表</legend>
+      <i-table :columns="tableColumns" :data="reportList"></i-table>
+    </fieldset>
+
+    <fieldset>
+      <legend>汇总</legend>
+
+      <table class="table table-bordered vertical-middle">
+        <thead>
+          <tr>
+            <th>姓名</th>
+            <th>工作内容</th>
+            <th>任务耗时</th>
+            <th>学习耗时</th>
+            <th>沟通耗时</th>
+            <th>其他</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{user.name || ''}}</td>
+            <td>
+              <ul>
+                <li :key="item.id" v-for="item in workList">
+                  {{item.content}}
+                  <span v-if="item.showTime">（{{item.time}}小时）</span>
+                </li>
+              </ul>
+            </td>
+            <td>{{taskTime | toInt}}</td>
+            <td>{{studyTime | toInt}}</td>
+            <td>{{communicationTime | toInt}}</td>
+            <td>
+              <ul v-if="leaveList.length">
+                <li :key="item.id" v-for="item in leaveList">
+                  {{item.content}}
+                  <span v-if="item.showTime">（{{item.time}}小时）</span>
+                </li>
+              </ul>
+              <span v-else>无</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <Button :disabled="reportList.length < 1" :loading="isSaving" @click="addToCloud" type="primary">提交到云端</Button>
+    </fieldset>
   </div>
 </template>
 
@@ -106,59 +109,56 @@ const config = {
   // 类型分类
   types: [
     {
-      key: "task",
-      text: "实际任务",
-      title: "任务描述",
-      info:
-        "能够获取到外部预算的开发任务，任务跟进过程中的沟通工作也包括在内。",
+      key: 'task',
+      text: '实际任务',
+      title: '任务描述',
+      info: '能够获取到外部预算的开发任务，任务跟进过程中的沟通工作也包括在内。',
       explain:
-        "请填写任务名称，并简要说明任务的进展情况，如存在风险，请一并说明。如：招投标大数据平台页面开发，涉及大量图表，部分页面需求还在变更，确定的已完成80%，暂无风险。"
+        '请填写任务名称，并简要说明任务的进展情况，如存在风险，请一并说明。如：招投标大数据平台页面开发，涉及大量图表，部分页面需求还在变更，确定的已完成80%，暂无风险。'
     },
     {
-      key: "communication",
-      text: "沟通管理",
-      info:
-        "主要针对团队内部的沟通管理工作，包括：工作督导、人员安排、代码评审等。",
-      title: "沟通内容",
-      explain:
-        "请填写沟通内容，如：评审某某的代码，形成评审纪要，并沟通明确整改。"
+      key: 'communication',
+      text: '沟通管理',
+      info: '主要针对团队内部的沟通管理工作，包括：工作督导、人员安排、代码评审等。',
+      title: '沟通内容',
+      explain: '请填写沟通内容，如：评审某某的代码，形成评审纪要，并沟通明确整改。'
     },
     {
-      key: "study",
-      text: "学习研究",
-      info:
-        "在自身工作有余力的情况下，进行的自我学习和技术研究，也包括新人的练习与学习。",
-      title: "学习内容",
-      explain: "请填写学习内容，如：学习handlebars模版引擎，并进行实践。"
+      key: 'study',
+      text: '学习研究',
+      info: '在自身工作有余力的情况下，进行的自我学习和技术研究，也包括新人的练习与学习。',
+      title: '学习内容',
+      explain: '请填写学习内容，如：学习handlebars模版引擎，并进行实践。'
     },
     {
-      key: "leave",
-      text: "请假调休",
-      info: "能确有急事请假 或者 正常调休。",
-      title: "请假说明",
-      explain:
-        "请如实填写请假缘由，如：近期加班较多，目前手头任务可控，调休一天，自我调节。"
+      key: 'leave',
+      text: '请假调休',
+      info: '能确有急事请假 或者 正常调休。',
+      title: '请假说明',
+      explain: '请如实填写请假缘由，如：近期加班较多，目前手头任务可控，调休一天，自我调节。'
     }
   ],
   // 默认的类型
-  defaultType: "task",
+  defaultType: 'task',
   // 时间描述说明
   time: {
-    title: "所花时间",
-    info: "不要求完全精确，分秒不差，但尽可能客观，不要虚报注水。",
-    explain: "请填写该事项所花费的时间，如果周末有加班时间，可以预先填报。"
+    title: '所花时间',
+    info: '不要求完全精确，分秒不差，但尽可能客观，不要虚报注水。',
+    explain: '请填写该事项所花费的时间，如果周末有加班时间，可以预先填报。'
   },
   // 每周基准工作时间
   fullTime: 40,
   // 计算为任务饱和度的工作类型 值为类型配置中的key
-  saturationTyps: ["task", "communication"]
+  saturationTyps: ['task', 'communication']
 };
+
+import { getWeekDate, getWeekDateText } from '@/util/date.js';
 
 // 从输入的内容中分隔出多条
 function getItems(content) {
   let items = content.split(/\n|\r|\r\n/);
   for (var i = items.length - 1; i > 0; --i) {
-    if (items[i].trim() === "") {
+    if (items[i].trim() === '') {
       items.splice(i, 1);
     }
   }
@@ -168,18 +168,18 @@ function getItems(content) {
 // 自动生成一个id
 let listIndex = 1;
 function getIndex() {
-  return "list-" + listIndex++;
+  return 'list-' + listIndex++;
 }
 
 export default {
   data() {
     return {
+      date: new Date(),
       type: config.defaultType,
       types: config.types,
       timeLabel: config.time,
-      user: {},
       data: {
-        content: "",
+        content: '',
         time: 0
       },
       taskList: [],
@@ -190,53 +190,53 @@ export default {
         content: [
           {
             required: true,
-            message: "请输入任务描述",
-            trigger: "blur"
+            message: '请输入任务描述',
+            trigger: 'blur'
           }
         ],
         time: [
           {
             required: true,
-            type: "number",
-            message: "必须输入花费时间",
-            trigger: "blur",
+            type: 'number',
+            message: '必须输入花费时间',
+            trigger: 'blur',
             min: 0.1
           }
         ]
       },
       tableColumns: [
         {
-          title: "工作内容",
-          key: "content"
+          title: '工作内容',
+          key: 'content'
         },
         {
-          title: "类型",
-          key: "typeText"
+          title: '类型',
+          key: 'typeText'
         },
         {
-          title: "时间",
-          key: "time",
+          title: '时间',
+          key: 'time',
           render: (h, params) => {
             if (params.row.showTime) {
-              return h("span", params.row.time);
+              return h('span', params.row.time);
             } else {
-              return h("span", "--");
+              return h('span', '--');
             }
           }
         },
         {
-          title: "操作",
+          title: '操作',
           render: (h, params) => {
-            return h("div", [
+            return h('div', [
               h(
-                "a",
+                'a',
                 {
                   props: {
-                    type: "normal",
-                    size: "small"
+                    type: 'normal',
+                    size: 'small'
                   },
                   style: {
-                    marginRight: "5px"
+                    marginRight: '5px'
                   },
                   on: {
                     click: () => {
@@ -244,14 +244,14 @@ export default {
                     }
                   }
                 },
-                "编辑"
+                '编辑'
               ),
               h(
-                "a",
+                'a',
                 {
                   props: {
-                    type: "danger",
-                    size: "small"
+                    type: 'danger',
+                    size: 'small'
                   },
                   on: {
                     click: () => {
@@ -259,7 +259,7 @@ export default {
                     }
                   }
                 },
-                "删除"
+                '删除'
               )
             ]);
           }
@@ -269,6 +269,15 @@ export default {
     };
   },
   computed: {
+    user() {
+      return this.$store.state.userData;
+    },
+    dateRange() {
+      return getWeekDate(this.date);
+    },
+    dateRangeText() {
+      return getWeekDateText(this.date);
+    },
     currType() {
       return this.types.filter(item => item.key === this.type)[0];
     },
@@ -309,14 +318,12 @@ export default {
   },
   watch: {
     currType() {
-      this.relues.content[0].message = "请输入" + this.currType.title;
+      this.relues.content[0].message = '请输入' + this.currType.title;
       this.$refs.form.validate();
     }
   },
   methods: {
-    getData() {
-      
-    },
+    getData() {},
     addItem() {
       this.$refs.form.validate(isValidated => {
         // 验证通过才处理
@@ -326,7 +333,7 @@ export default {
           let showTime = length > 1 ? false : true;
 
           items.forEach(item => {
-            this[this.currType.key + "List"].push({
+            this[this.currType.key + 'List'].push({
               id: getIndex(),
               type: this.currType.key,
               typeText: this.currType.text,
@@ -336,21 +343,21 @@ export default {
             });
           });
 
-          this.data.content = "";
+          this.data.content = '';
           this.data.time = 0;
         }
       });
     },
     deleteItem(row, index) {
-      this[row.type + "List"].splice(index, 1);
+      this[row.type + 'List'].splice(index, 1);
     },
     editItem(row, index) {
       if (this.data.content.trim() || this.data.time) {
-        this.$Message.warning("请先处理当前正在输入的内容");
+        this.$Message.warning('请先处理当前正在输入的内容');
         return;
       }
 
-      let currData = this[row.type + "List"].splice(index, 1)[0];
+      let currData = this[row.type + 'List'].splice(index, 1)[0];
 
       console.log(currData);
       this.type = currData.type;
@@ -377,7 +384,7 @@ export default {
       //   });
     },
     showSuccessTips() {
-      this.$Message.success("提交成功");
+      this.$Message.success('提交成功');
     }
   }
 };

@@ -1,23 +1,32 @@
-import Vue from "vue";
-import App from "./App.vue";
-import "./registerServiceWorker";
-import router from "./router";
-import store from "./store";
+import Vue from 'vue';
+import App from './App.vue';
+import './registerServiceWorker';
+import router from './router';
+import store from './store';
+import fetchData from './util/fetch';
+import './style/style.scss';
 
-import ViewUI from "view-design";
-import "view-design/dist/styles/iview.css";
+import ViewUI from 'view-design';
+import 'view-design/dist/styles/iview.css';
 Vue.use(ViewUI);
 
 Vue.config.productionTip = false;
+Vue.prototype.$fetch = fetchData;
 
 // 全局过滤器
-Vue.filter("toInt", function(v = "") {
+Vue.filter('toInt', function(v = '') {
   return parseInt(v.toFixed(0), 10);
 });
 
 new Vue({
   router,
   store,
-  render: h => h(App)
-}).$mount("#app");
-
+  render: h => h(App),
+  mounted() {
+    this.$fetch('http://localhost:2222/fe-manage/api/user/autoLogin').then(res => {
+      if (res.code === 200) {
+        this.$store.commit('updateUserData', {data:res.data});
+      }
+    });
+  }
+}).$mount('#app');
