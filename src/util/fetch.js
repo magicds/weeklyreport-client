@@ -1,4 +1,4 @@
-export default function fetchData(url, method = 'GET', data) {
+export default function fetchData(url, data) {
   // Default options are marked with *
   const opt = {
     // body: JSON.stringify(data), // must match 'Content-Type' header
@@ -7,12 +7,14 @@ export default function fetchData(url, method = 'GET', data) {
     headers: {
       'content-type': 'application/json'
     },
-    method: method, // *GET, POST, PUT, DELETE, etc.
+    method: 'GET', // *GET, POST, PUT, DELETE, etc.
     mode: 'cors', // no-cors, cors, *same-origin
     redirect: 'follow' // manual, *follow, error
     // referrer: 'no-referrer' // *client, no-referrer
   };
-  if (method === 'POST' && data) {
+
+  if (data) {
+    opt.method = 'POST';
     opt.body = JSON.stringify(data);
   }
   return fetch(url, opt).then(response => response.json()); // parses response to JSON

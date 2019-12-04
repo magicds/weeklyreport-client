@@ -3,27 +3,42 @@
     <div class="left">
       <router-link :to="{ name: 'input'}" class="nav-link" v-if="!user.noReport">周报填写</router-link>
       <router-link :to="{ name: 'summary'}" class="nav-link">周报汇总</router-link>
+      <router-link :to="{ name: 'dept'}" class="nav-link" v-if="user.role >= 100">部门管理</router-link>
+      <router-link :to="{ name: 'person'}" class="nav-link" v-if="user.role >= 100">人员管理</router-link>
     </div>
 
-    <UserIcon class="header-user-icon" :data="user" :ext-items="[]" />
+    <UserIcon class="header-user-icon" :data="user" :ext-items="[]" :onItemClick="onItemClick" />
   </nav>
 </template>
 
 <script>
-import UserIcon from "./UserIcon.vue";
+import UserIcon from './UserIcon.vue';
 export default {
-  name: "header-nav",
+  name: 'header-nav',
   components: {
     UserIcon
   },
-  data() {
-    return {
-      
-    };
+  props: {
+    user: Object
   },
-  computed:{
-    user() {
-      return this.$store.state.userData
+  data() {
+    return {};
+  },
+  methods: {
+    logout() {
+      return this.$fetch('http://localhost:2222/fe-manage/api/user/logout').then(res => {
+        if (res.code == 200) {
+          this.$store.commit('updateUserData', { data: null });
+          this.$router.push('/');
+        } else {
+          this.$Message.error(res.message);
+        }
+      });
+    },
+    onItemClick(type) {
+      if (type == 'logout') {
+        return this.logout();
+      }
     }
   }
 };
@@ -39,7 +54,7 @@ export default {
   &:after {
     display: table;
     clear: both;
-    content: "";
+    content: '';
   }
   .left {
     line-height: 37px;

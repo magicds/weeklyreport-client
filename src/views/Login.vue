@@ -73,14 +73,31 @@ export default {
       }
     };
   },
+  mounted() {
+    this.autoLogin();
+  },
   methods: {
+    autoLogin() {
+      this.$fetch('http://localhost:2222/fe-manage/api/user/autoLogin').then(res => {
+        if (res.code === 200) {
+          this.$store.commit('updateUserData', { data: res.data });
+          // 提取跳转
+          const { params } = this.$route;
+          if (params && params.originPath) {
+            this.$router.push(params.originPath);
+          } else {
+            this.$router.push({ name: 'summary' });
+          }
+        }
+      });
+    },
     handleSubmit(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
           // this.$Message.success('Success!');
           const { email, password } = this.user;
           // Api.User.logIn(username, password)
-          this.$fetch('http://localhost:2222/fe-manage/api/user/login', 'POST', {
+          this.$fetch('http://localhost:2222/fe-manage/api/user/login', {
             email,
             pwd: password
           })
@@ -89,8 +106,8 @@ export default {
                 this.$store.commit('updateUserData', { data: res.data });
                 this.$router.push({ name: 'input' });
               } else {
-                this.$store.commit('updateUserData', null);
-                this.loginError(res);
+                this.$store.commit('updateUserData', { data: null });
+                this.$Message.error(res.message);
               }
               console.log(res);
             })

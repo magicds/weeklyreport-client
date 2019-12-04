@@ -8,8 +8,8 @@
           <Icon type="ios-mail" slot="prepend"></Icon>
         </i-input>
       </FormItem>
-      <FormItem prop="password" label="密码">
-        <i-input type="password" v-model="user.password" placeholder="请输入登录密码">
+      <FormItem prop="pwd" label="密码">
+        <i-input type="password" v-model="user.pwd" placeholder="请输入登录密码">
           <Icon type="ios-lock-outline" slot="prepend"></Icon>
         </i-input>
       </FormItem>
@@ -25,7 +25,7 @@
       </FormItem>
       <FormItem prop="group" label="所属小组">
         <Select v-model="user.group" prefix="ios-people">
-          <Option v-for="item in groupList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+          <Option v-for="item in (deptMap[user.dept] ? deptMap[user.dept].groups: [])" :value="item.id" :key="item.id">{{ item.name }}</Option>
         </Select>
       </FormItem>
       <FormItem prop="gender" label="性别">
@@ -50,88 +50,119 @@
 
 <script>
 export default {
-  name: "signin",
+  name: 'signin',
   data() {
     return {
-      deptList: [],
+      groupList: [],
       user: {
-        name: "",
+        name: '',
         gender: undefined,
-        username: "",
-        password: "",
-        dept: ""
+        username: '',
+        pwd: '',
+        dept: '',
+        group: ''
       },
       userRule: {
         pwd: [
           {
             required: true,
-            message: "请输入密码",
-            trigger: "blur"
+            message: '请输入密码',
+            trigger: 'blur'
           },
           {
-            type: "string",
+            type: 'string',
             min: 6,
-            message: "密码至少6位",
-            trigger: "blur"
+            message: '密码至少6位',
+            trigger: 'blur'
           }
         ],
         name: [
           {
             required: true,
-            message: "姓名必填",
-            trigger: "blur"
+            message: '姓名必填',
+            trigger: 'blur'
           }
         ],
         gender: [
           {
             required: true,
-            message: "请选择性别",
-            trigger: "blur"
+            message: '请选择性别',
+            trigger: 'blur'
           }
         ],
         dept: [
           {
             required: true,
-            message: "请选择所属部门",
-            trigger: "blur"
+            message: '请选择所属部门',
+            trigger: 'blur'
           }
         ],
         group: [
           {
             required: true,
-            message: "请选择所属小组",
-            trigger: "blur"
+            message: '请选择所属小组',
+            trigger: 'blur'
           }
         ],
-        email: [{ type: "email", message: "邮箱格式不正确", trigger: "blur" }]
+        email: [{ type: 'email', message: '邮箱格式不正确', trigger: 'blur' }]
       }
     };
   },
   computed: {
-    groupList() {
-      return [];
+    deptList() {
+      const d = this.deptMap;
+      return Object.keys(d).map(k => d[k]);
+    },
+    deptMap() {
+      if (!this.groupList.length) return {};
+      const d = {};
+      this.groupList.forEach(g => {
+        const dept = g.dept;
+        if (!dept || !dept.id) return;
+
+        if (!d[dept.id]) {
+          d[dept.id] = {
+            id: dept.id,
+            name: dept.name,
+            groups: [g]
+          };
+        } else {
+          d[dept.id].groups.push(g);
+        }
+      });
+      return d;
     }
   },
   mounted() {
-    this.getDeptData();
+    this.getGroupData();
   },
   methods: {
-    getDeptData() {
-      // return Api.getDeptList().then(r => {
-      //   this.deptList = r.map(this.$util._flatDeptData) || [];
-      // });
+    getGroupData() {
+      this.$fetch('http://localhost:2222/fe-manage/api/group/list').then(res => {
+        console.log(res);
+        if (res.code !== 200) {
+          return this.$Message.error(res.message);
+        }
+        this.groupList = res.data;
+      });
     },
     toLogin() {
-      this.$router.push("/login");
+      this.$router.push('/login');
     },
     handleSubmit(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          this.$Message.success("注册成功，请等待管理者审批");
+          this.$fetch('http://localhost:2222/fe-manage/api/user/signup', {...this.user}).then(res => {
+            if (res.code == 200) {
+              return this.$Message.error('注册失败' + res.message);
+            }
 
-          // this.$Message.error("注册失败" + err.message);
+            this.$Message.success('注册成功，请等待管理者审批');
+            this.$router.push({name:'login'});
+            //
+          });
         } else {
-          this.$Message.error("请检查信息");
+          this.$Message.error('请检查信息');
         }
       });
     }

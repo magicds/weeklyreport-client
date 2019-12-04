@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Header />
+    <Header :user="user" />
     <router-view></router-view>
   </div>
 </template>
@@ -8,7 +8,12 @@
 <script>
 import Header from '@/components/Header'
 export default {
-  components: {Header}
+  components: {Header},
+  computed:{
+    user() {
+      return this.$store.state.userData
+    }
+  }
 }
 </script>
 

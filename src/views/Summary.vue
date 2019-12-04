@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: "summary"
+  name: "week-summary"
 };
 </script>
 

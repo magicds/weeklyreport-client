@@ -21,12 +21,5 @@ Vue.filter('toInt', function(v = '') {
 new Vue({
   router,
   store,
-  render: h => h(App),
-  mounted() {
-    this.$fetch('http://localhost:2222/fe-manage/api/user/autoLogin').then(res => {
-      if (res.code === 200) {
-        this.$store.commit('updateUserData', {data:res.data});
-      }
-    });
-  }
+  render: h => h(App)
 }).$mount('#app');
