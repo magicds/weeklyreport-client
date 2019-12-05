@@ -311,11 +311,16 @@ export default {
           return;
         }
         if (res.data && res.data.length) {
+          this.$Message.config({
+            top: window.innerHeight * 0.4
+          });
           this.$Message.info({
             content: '本周已经填写，已经为您自动还原数据，您可进一步修改',
             closable: true,
-            top: window.innerHeight * .4,
             duration: 5
+          });
+          this.$Message.config({
+            top: 50
           });
 
           const data = res.data[0];
