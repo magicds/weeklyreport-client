@@ -1,7 +1,7 @@
 <template>
   <Dropdown @on-click="itemClick" placement="bottom-end" trigger="click">
     <a class href="javascript:void(0)">
-      <Avatar size="default">{{data.name}}</Avatar>
+      <Avatar size="default">{{data.name | shortName}}</Avatar>
     </a>
     <DropdownMenu slot="list">
       <DropdownItem name="userinfo">个人信息</DropdownItem>

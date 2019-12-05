@@ -1,6 +1,6 @@
 <template>
   <div class="person-input">
-    <Alert type="error">
+    <Alert type="error" class="header-alert">
       <p>请大家每周五下班前按要求填写周报，若每月有3次未按要求填写周报，考虑月浮动奖罚，以做规范手段。</p>
       <p>周报的目的：</p>
       <ol class="weekly-aims">
@@ -16,8 +16,10 @@
 
     <fieldset v-if="user.name">
       <legend>基本信息</legend>
-      <div>{{user.dept.name || ''}} - {{user.group.name || ''}} - {{user.name}}</div>
-      <p>{{dateRangeText}}</p>
+      <div class="user-info">
+        <span>{{user.dept.name || ''}} - {{user.group.name || ''}} - {{user.name}}</span>
+        <span>周报日期：{{dateRangeText}}</span>
+      </div>
     </fieldset>
 
     <i-form :model="data" :rules="relues" label-position="top" ref="form">
@@ -64,11 +66,11 @@
       <table class="table table-bordered vertical-middle">
         <thead>
           <tr>
-            <th>姓名</th>
+            <th style="width:120px;">姓名</th>
             <th>工作内容</th>
-            <th>任务耗时</th>
-            <th>学习耗时</th>
-            <th>沟通耗时</th>
+            <th style="width:80px;">任务耗时</th>
+            <th style="width:80px;">学习耗时</th>
+            <th style="width:80px;">沟通耗时</th>
             <th>其他</th>
           </tr>
         </thead>
@@ -165,11 +167,7 @@ function getItems(content) {
   return items;
 }
 
-// 自动生成一个id
-let listIndex = 1;
-function getIndex() {
-  return 'list-' + listIndex++;
-}
+const MILLI_SECONDS = (2000 - 1970) * 365 * 24 * 60 * 60 * 1000;
 
 export default {
   data() {
@@ -186,6 +184,7 @@ export default {
       studyList: [],
       communicationList: [],
       leaveList: [],
+      itemId: 1,
       relues: {
         content: [
           {
@@ -211,11 +210,13 @@ export default {
         },
         {
           title: '类型',
+          width: 140,
           key: 'typeText'
         },
         {
           title: '时间',
           key: 'time',
+          width: 100,
           render: (h, params) => {
             if (params.row.showTime) {
               return h('span', params.row.time);
@@ -226,41 +227,13 @@ export default {
         },
         {
           title: '操作',
+          width: 120,
           render: (h, params) => {
             return h('div', [
-              h(
-                'a',
-                {
-                  props: {
-                    type: 'normal',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.editItem(params.row, params.index);
-                    }
-                  }
-                },
-                '编辑'
-              ),
-              h(
-                'a',
-                {
-                  props: {
-                    type: 'danger',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => {
-                      this.deleteItem(params.row, params.index);
-                    }
-                  }
-                },
-                '删除'
-              )
+              // prettier-ignore
+              h('a', { props: { type: 'normal', size: 'small' }, style: { marginRight: '5px' }, on: {click: () => {this.editItem(params.row, params.index);} } }, '编辑'),
+              // prettier-ignore
+              h('a', { props: { type: 'danger', size: 'small' }, on: { click: () => {  this.deleteItem(params.row, params.index);} } },'删除')
             ]);
           }
         }
@@ -322,8 +295,39 @@ export default {
       this.$refs.form.validate();
     }
   },
+  mounted() {
+    this.getData();
+  },
   methods: {
-    getData() {},
+    getItemIndex() {
+      return (+new Date() - MILLI_SECONDS).toString(16) + '-' + (Math.random() * 10000).toString(16);
+    },
+    getData() {
+      return this.$fetch('http://localhost:2222/fe-manage/api/weeklyLog/week', {
+        week: this.dateRangeText,
+        user: this.user.id
+      }).then(res => {
+        if (res.code != 200) {
+          return;
+        }
+        if (res.data && res.data.length) {
+          this.$Message.info({
+            content: '本周已经填写，已经为您自动还原数据，您可进一步修改',
+            closable: true,
+            top: window.innerHeight * .4,
+            duration: 5
+          });
+
+          const data = res.data[0];
+          const report = data.report;
+
+          this.taskList = report.taskList;
+          this.studyList = report.studyList;
+          this.leaveList = report.leaveList;
+          this.communicationList = report.communicationList;
+        }
+      });
+    },
     addItem() {
       this.$refs.form.validate(isValidated => {
         // 验证通过才处理
@@ -334,7 +338,7 @@ export default {
 
           items.forEach(item => {
             this[this.currType.key + 'List'].push({
-              id: getIndex(),
+              id: this.getItemIndex(),
               type: this.currType.key,
               typeText: this.currType.text,
               content: item,
@@ -365,30 +369,78 @@ export default {
       this.data.time = currData.time;
     },
     addToCloud() {
+      if (!this.reportList.length) {
+        return this.$Message.error('你还未填写！');
+      }
       this.isSaving = true;
+      try {
+        const saveData = {
+          week: this.dateRangeText,
+          user: this.user.id,
+          group: this.user.group.id,
+          dept: this.user.dept.id,
+          report: {
+            taskList: this.taskList,
+            studyList: this.studyList,
+            leaveList: this.leaveList,
+            communicationList: this.communicationList,
+            taskTime: this.taskTime,
+            studyTime: this.studyTime,
+            communicationTime: this.communicationTime,
+            leaveTime: this.leaveTime
+          }
+        };
 
-      // api
-      //   .addReprot({
-      //     workList: this.workList,
-      //     leaveList: this.leaveList,
-      //     studyTime: this.studyTime,
-      //     taskTime: this.taskTime,
-      //     communicationTime: this.communicationTime,
-      //     leaveTime: this.leaveTime,
-      //     saturation: (this.taskTime + this.communicationTime) / 40
-      //   })
-      //   .then(savedData => {
-      //     console.log(savedData);
-      //     this.isSaving = false;
-      //     this.showSuccessTips();
-      //   });
-    },
-    showSuccessTips() {
-      this.$Message.success('提交成功');
+        this.$fetch('http://localhost:2222/fe-manage/api/weeklyLog/addOrUpdate', saveData).then(res => {
+          if (res.code === 200) {
+            this.$Message.success('保存成功');
+          } else {
+            console.error(res.message);
+            this.$Message.error(res.message);
+          }
+          this.isSaving = false;
+        });
+      } catch (error) {
+        this.$Message.error(error.message);
+        this.isSaving = false;
+      }
     }
   }
 };
 </script>
 
-<style>
+<style scoped lang="scss">
+.person-input {
+  line-height: 2;
+
+  .ivu-alert {
+    line-height: 2;
+  }
+}
+.header-alert {
+  color: #ed4014;
+  line-height: 2;
+}
+.type-info .light {
+  color: #000;
+  font-weight: 700;
+}
+ol,
+ul {
+  padding-left: 24px;
+}
+fieldset {
+  border: 0;
+  margin-top: 24px;
+}
+legend {
+  margin-bottom: 8px;
+}
+
+.user-info {
+  display: flex;
+  span + span {
+    margin-left: 24px;
+  }
+}
 </style>

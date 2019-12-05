@@ -1,3 +1,5 @@
+@import './base.scss';
+
 // #region zui- table
 .table {
   width: 100%;
@@ -258,3 +260,24 @@ table th[class*='col-'] {
   }
 }
 // #endregion
+
+// zui 
+fieldset, ul {
+  padding: 0;
+  margin: 0;
+}
+fieldset, legend {
+  border: 0;
+}
+legend {
+  font-size: 19.5px;
+  line-height: inherit;
+  display: block;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 0;
+  color: #333;
+  border-bottom: 1px solid #e5e5e5;
+}
+@import './gap.scss';
+@import './ext.scss';

@@ -1,35 +1,70 @@
 <template>
   <div>
-    <div class="dept-nav" v-if="deptList.length"></div>
+    <nav class="dept-nav" v-if="deptUserTree.length > 1">
+      <span class="dept-nav-item" :class="{'active': activeId === dept.id}" @click="activeId = dept.id" :data-target="dept.id" v-for="dept in deptUserTree" :key="dept.id">{{dept.name}}</span>
+    </nav>
 
-    <div class="dept-list" v-if="deptList.length">
-      <Row class="dept-item" v-for="dept in deptList" :key="dept.id">
-        <h3>{{dept.name}}</h3>
-        <div class="group-list" v-if="dept.groups">
-          <div class="group-item" v-for="group in dept.groups" :key="group.id">
-            <p>
-              组名：{{group.name}}
-              人数：{{group.members ? group.members.length : 0}}
-            </p>
-            <Card v-for="user in group.members" :key="user.id">
-              {{user.name}}
-              {{user.group.name}}
+    <div class="dept-list" v-if="deptUserTree.length">
+      <div class="dept-item" v-for="dept in deptUserTree" :key="dept.id" :data-key="dept.id">
+        <h3 class="dept-name">{{dept.name}}</h3>
+        <Row :gutter="16" v-if="dept.members && dept.members.length">
+          <i-col :lg="{span:8}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in dept.members" :key="user.id">
+            <Card>
+              <UserCard :user="user" />
             </Card>
-          </div>
-        </div>
-      </Row>
+          </i-col>
+        </Row>
+        <div class="dept-empty" v-else>此部门暂无成员</div>
+      </div>
     </div>
+
+    <!-- 游离人员 -->
+    <Row class="other-user-list" :gutter="16" v-if="otherUsers && otherUsers.length">
+      <i-col :lg="{span:8}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in otherUsers" :key="user.id">
+        <Card>
+          <UserCard :user="user" />
+        </Card>
+      </i-col>
+    </Row>
   </div>
 </template>
 
 <script>
+import UserCard from '@/components/UserCard.vue';
+import scrollTo from '@/mixin/scrollto.js';
+
 export default {
   name: 'staff-list',
+  components: { UserCard },
   data() {
     return {
       deptList: [],
-      otherUsers: []
+      otherUsers: [],
+      activeId: ''
     };
+  },
+  mixins: [scrollTo],
+  computed: {
+    deptUserTree() {
+      const deptUserTree = JSON.parse(JSON.stringify(this.deptList));
+
+      deptUserTree.forEach(dept => {
+        const deptLeader = dept.leader ? dept.leader.id : false;
+        dept.members = dept.groups
+          .map(group => {
+            const groupLeader = group.leader ? group.leader.id : false;
+            group.members.forEach(user=>{
+              user.isDeptLeader = user.id === deptLeader;
+              user.isGroupLeader = user.id === groupLeader;
+            })
+            return group.members;
+          })
+          .flat();
+        console.log(dept.members);
+      });
+      console.log(deptUserTree);
+      return deptUserTree;
+    }
   },
   mounted() {
     this.getData();
@@ -37,7 +72,6 @@ export default {
   methods: {
     getData() {
       this.$fetch('http://localhost:2222/fe-manage/api/dept/tree').then(res => {
-        console.log(res);
         if (res.code !== 200) {
           return;
         }
@@ -45,9 +79,19 @@ export default {
         this.otherUsers = res.data.users;
       });
     }
+  },
+  watch: {
+    activeId(v) {
+      this.scrollTo(document.querySelector(`.dept-item[data-key="${v}"]`));
+    }
   }
 };
 </script>
 
-<style>
+<style socped lang="scss">
+
+.dept-empty {
+  margin: 8px 0;
+  color: #999;
+}
 </style>
