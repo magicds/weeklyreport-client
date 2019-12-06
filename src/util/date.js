@@ -54,6 +54,7 @@ export function getWeekDateText(d) {
 }
 
 export default {
+  date2text,
   getWeekStart,
   getWeekEnd,
   getWeekDate,
