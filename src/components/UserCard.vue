@@ -2,7 +2,7 @@
   <div class="user-card-inner">
     <div class="left">
       <label class="upload-avatar" for="useravatar">
-        <Avatar :src="user.avatar" :style="{background: '#64b1ca',color:'#fff'}" class="user-avatar" ref="avatar" :size="60">{{user.name | shortName}}</Avatar>
+        <Avatar :src="user.avatar" :style="{background: '#2d8cf0',color:'#fff'}" class="user-avatar" ref="avatar" :size="60">{{user.name | shortName}}</Avatar>
       </label>
       <p v-if="user.avatar">{{user.name | shortName}}</p>
       <!-- <input @change="savePhoto" accept=".jpg, .png" id="useravatar" name="useravatar" style="position:absolute;top:-100%;left:-100%;opacity:0;" type="file" /> -->
@@ -59,7 +59,12 @@ export default {
     }
   },
   methods: {
-    startEdit() {}
+    startEdit() {
+      alert('功能即将上线，请稍后');
+    },
+    deleteUser() {
+      alert('功能即将上线，请稍后');
+    }
   }
 };
 </script>

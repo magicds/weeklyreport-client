@@ -138,7 +138,7 @@ export default {
   },
   methods: {
     getGroupData() {
-      this.$fetch('http://localhost:2222/fe-manage/api/group/list').then(res => {
+      this.$fetch('api/group/list').then(res => {
         console.log(res);
         if (res.code !== 200) {
           return this.$Message.error(res.message);
@@ -152,7 +152,7 @@ export default {
     handleSubmit(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          this.$fetch('http://localhost:2222/fe-manage/api/user/signup', {...this.user}).then(res => {
+          this.$fetch('api/user/signup', {...this.user}).then(res => {
             if (res.code == 200) {
               return this.$Message.error('注册失败' + res.message);
             }

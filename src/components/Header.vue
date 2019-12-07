@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     logout() {
-      return this.$fetch('http://localhost:2222/fe-manage/api/user/logout').then(res => {
+      return this.$fetch('api/user/logout').then(res => {
         if (res.code == 200) {
           this.$store.commit('updateUserData', { data: null });
           this.$router.push('/');
@@ -38,6 +38,8 @@ export default {
     onItemClick(type) {
       if (type == 'logout') {
         return this.logout();
+      } else {
+        return alert('功能即将上线，请稍后');
       }
     }
   }

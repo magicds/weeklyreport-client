@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     getData() {
-      this.$fetch('http://localhost:2222/fe-manage/api/dept/tree').then(res => {
+      this.$fetch('api/dept/tree').then(res => {
         if (res.code !== 200) {
           return;
         }

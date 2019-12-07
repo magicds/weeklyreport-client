@@ -78,7 +78,7 @@ export default {
   },
   methods: {
     autoLogin() {
-      this.$fetch('http://localhost:2222/fe-manage/api/user/autoLogin').then(res => {
+      this.$fetch('api/user/autoLogin').then(res => {
         if (res.code === 200) {
           this.$store.commit('updateUserData', { data: res.data });
           // 提取跳转
@@ -97,7 +97,7 @@ export default {
           // this.$Message.success('Success!');
           const { email, password } = this.user;
           // Api.User.logIn(username, password)
-          this.$fetch('http://localhost:2222/fe-manage/api/user/login', {
+          this.$fetch('api/user/login', {
             email,
             pwd: password
           })

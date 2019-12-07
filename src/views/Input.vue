@@ -303,7 +303,7 @@ export default {
       return (+new Date() - MILLI_SECONDS).toString(16) + '-' + (Math.random() * 10000).toString(16);
     },
     getData() {
-      return this.$fetch('http://localhost:2222/fe-manage/api/weeklyLog/week', {
+      return this.$fetch('api/weeklyLog/week', {
         week: this.dateRangeText,
         user: this.user.id
       }).then(res => {
@@ -396,7 +396,7 @@ export default {
           }
         };
 
-        this.$fetch('http://localhost:2222/fe-manage/api/weeklyLog/addOrUpdate', saveData).then(res => {
+        this.$fetch('api/weeklyLog/addOrUpdate', saveData).then(res => {
           if (res.code === 200) {
             this.$Message.success('保存成功');
           } else {

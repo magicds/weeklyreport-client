@@ -1,21 +1,17 @@
 <template>
-  <div>
-    <div>
-      <Select v-model="rangeType">
-        <Option v-for="item in rangeList" :key="item.value" :value="item.value">{{item.text}}</Option>
-      </Select>
-      <DatePicker v-if="rangeType==='week'" type="daterange" v-model="date" placement="bottom-start" placeholder="请选择一个时间段" :options="weekPreSetting"></DatePicker>
-      {{rangeType}}选择
-      <Select v-model="rangeValue" v-if="rangeType != 'year' && rangeType != 'week'">
-        <OptionGroup v-for="y in optionMap[rangeType]" :key="y.value" :label="y.text">
-          <Option v-for="item in y.children" :key="item.value" :value="item.value">{{item.text}}</Option>
-        </OptionGroup>
-      </Select>
-      <Select v-model="rangeValue" v-if="rangeType == 'year'">
-        <Option v-for="item in optionMap[rangeType]" :key="item.value" :value="item.value">{{item.text}}</Option>
-      </Select>
-      <span>{{currentValue}}</span>
-    </div>
+  <div class="range-select">
+    <Select v-model="rangeType" class="range-type-select">
+      <Option v-for="item in rangeList" :key="item.value" :value="item.value">{{item.text}}</Option>
+    </Select>
+    <DatePicker class="range-date-select" v-if="rangeType==='week'" type="daterange" v-model="date" placement="bottom-start" placeholder="请选择一个时间段" :options="weekPreSetting"></DatePicker>
+    <Select v-model="rangeValue" v-if="rangeType != 'year' && rangeType != 'week'" class="range-value-select">
+      <OptionGroup v-for="y in optionMap[rangeType]" :key="y.value" :label="y.text">
+        <Option v-for="item in y.children" :key="item.value" :value="item.value">{{item.text}}</Option>
+      </OptionGroup>
+    </Select>
+    <Select v-model="rangeValue" v-if="rangeType == 'year'" class="range-value-select">
+      <Option v-for="item in optionMap[rangeType]" :key="item.value" :value="item.value">{{item.text}}</Option>
+    </Select>
   </div>
 </template>
 
@@ -60,7 +56,7 @@ function getDateRange(weeks, toPrev) {
 export default {
   name: 'range-select',
   props: {
-    value: { type: String },
+    value: { type: Object },
 
     startDate: {
       type: String,
@@ -69,7 +65,6 @@ export default {
   },
   data() {
     return {
-      currentText: '',
       rangeValue: '',
       rangeType: 'week',
       rangeList: [
@@ -94,19 +89,19 @@ export default {
             }
           },
           {
-            text: '前二周',
+            text: '最近2周',
             value() {
               return getDateRange(2);
             }
           },
           {
-            text: '前三周',
+            text: '最近三周',
             value() {
               return getDateRange(3);
             }
           },
           {
-            text: '前三周',
+            text: '最近四周',
             value() {
               return getDateRange(4);
             }
@@ -122,20 +117,61 @@ export default {
         const e = date2text(getWeekEnd(this.date[1]));
         // const weeks = 1
         // return `${s}~${e}`;
-        return [s, e];
+        return { start: s, end: e };
       }
+      let startDate, endDate;
+      if (!this.rangeValue) {
+        return { start: '', end: '' };
+      }
+
       if (this.rangeType == 'year') {
         const y = parseInt(this.rangeValue, 10);
         if (!y) return [];
         // 获取上一年年底最后最后一周的周日 再往前后一天即为今年第一周的开始
         const lastYearEnd = getWeekEnd(new Date(y - 1, 11, 31));
         lastYearEnd.setDate(lastYearEnd.getDate() + 1);
-        const s = date2text(lastYearEnd);
-        const e = date2text(getWeekEnd(new Date(y, 11, 31)));
-        return [s, e];
+
+        startDate = lastYearEnd;
+        endDate = getWeekEnd(new Date(y, 11, 31));
       }
-      // todo month and quator
-      return this.rangeValue;
+
+      if (this.rangeType == 'month') {
+        const [y, m] = this.rangeValue.split('-').map(v => parseInt(v, 10));
+        if (!y || !m) return;
+        // 1 号为周一 则第一周就是 否则 +7 再取周一才为真的第一种开始
+        const firstDate = new Date(y, m - 1, 1);
+        if (firstDate.getDay() === 1) {
+          startDate = getWeekStart(firstDate);
+        } else {
+          firstDate.setDate(firstDate.getDate() + 7);
+          startDate = getWeekStart(firstDate);
+        }
+        // 下月一号往前一天及当前月的最后一天
+        endDate = getWeekEnd(new Date(y, m, 0));
+      }
+
+      if (this.rangeType == 'quarter') {
+        const [y, q] = this.rangeValue
+          .replace('q', '')
+          .split('-')
+          .map(v => parseInt(v, 10));
+        const ms = (q - 1) * 3;
+        const me = q * 3 - 1;
+
+        // 1 号为周一 则第一周就是 否则 +7 再取周一才为真的第一种开始
+        const firstDate = new Date(y, ms, 1);
+        if (firstDate.getDay() === 1) {
+          startDate = getWeekStart(firstDate);
+        } else {
+          firstDate.setDate(firstDate.getDate() + 7);
+          startDate = getWeekStart(firstDate);
+        }
+        const lastDate = new Date(y, me + 1, 0);
+
+        endDate = getWeekEnd(lastDate);
+      }
+
+      return { start: date2text(startDate), end: date2text(endDate) };
     },
     configStartYear() {
       return parseInt(this.startDate.split('-')[0], 10) || new Date().getFullYear() - 3;
@@ -145,7 +181,7 @@ export default {
     },
     yearList() {
       const year = new Date().getFullYear();
-      return [...new Array(year - this.configStartYear + 1 || 3)].map((_, i) => year - i);
+      return [...new Array(year - this.configStartYear + 1 || 3)].map((_, i) => year - i + '');
     },
     monthList() {
       const [startYear, sStartMonth] = [this.configStartYear, this.configStartMonth];
@@ -185,9 +221,49 @@ export default {
         quarter: this.quarterList
       };
     }
+  },
+  watch: {
+    currentValue(v) {
+      this.$emit('input', v);
+    },
+    rangeType(v) {
+      if (v == 'week') return;
+      if (v == 'year') {
+        debugger;
+        if (!/^\d{4}$/.test(this.rangeValue)) {
+          this.rangeValue = this.yearList[0];
+        }
+        return;
+      }
+
+      if (v == 'month') {
+        if (!/^\d{4}-\d{2}$/.test(this.rangeValue)) {
+          this.rangeValue = this.monthList[0].children[0].value;
+        }
+        return;
+      }
+      if (v == 'quarter') {
+        if (!/^\d{4}-q\d$/.test(this.rangeValue)) {
+          this.rangeValue = this.quarterList[0].children[0].value;
+        }
+        return;
+      }
+    }
   }
 };
 </script>
 
 <style>
+.range-select {
+  display: inline-block;
+}
+.range-type-select {
+  width: 70px;
+  margin-right: 8px;
+}
+.range-value-select {
+  width: 140px;
+}
+.range-date-select {
+}
 </style>

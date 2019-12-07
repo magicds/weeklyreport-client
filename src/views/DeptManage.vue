@@ -146,7 +146,7 @@ export default {
   },
   methods: {
     getData() {
-      this.$fetch('http://localhost:2222/fe-manage/api/dept/tree').then(res => {
+      this.$fetch('api/dept/tree').then(res => {
         console.log(res);
         if (res.code !== 200) {
           return;
@@ -196,7 +196,7 @@ export default {
         saveData.deptId = deptId;
       }
 
-      this.$fetch('http://localhost:2222/fe-manage/api/dept/' + type, saveData).then(res => {
+      this.$fetch('api/dept/' + type, saveData).then(res => {
         console.log(res);
         if (res.code !== 200) {
           this.$Message.error('保存失败！' + res.message);
@@ -254,7 +254,7 @@ export default {
         saveData.dept = deptId;
       }
 
-      this.$fetch('http://localhost:2222/fe-manage/api/group/' + type, saveData).then(res => {
+      this.$fetch('api/group/' + type, saveData).then(res => {
         console.log(res);
         if (res.code !== 200) {
           this.$Message.error('保存失败！' + res.message);
@@ -276,7 +276,7 @@ export default {
         title: '系统警告',
         content: '确定删除此部门，删除后此部门的所有数据将丢失，是否继续',
         onOk() {
-          that.$fetch('http://localhost:2222/fe-manage/api/dept/remove', { id: dept.id }).then(res => {
+          that.$fetch('dept/remove', { id: dept.id }).then(res => {
             if (res.code === 200) {
               that.$Message.success('删除成功');
               that.getData();
@@ -296,7 +296,7 @@ export default {
         title: '系统警告',
         content: '确定删除此小组，删除后此小组的所有数据将丢失，是否继续',
         onOk() {
-          that.$fetch('http://localhost:2222/fe-manage/api/group/remove', { id: group.id }).then(res => {
+          that.$fetch('group/remove', { id: group.id }).then(res => {
             if (res.code === 200) {
               that.getData();
               that.$Message.success('删除成功');

@@ -52,11 +52,23 @@ export function getWeekDateText(d) {
   const { start, end } = getWeekDate(d);
   return `${date2text(start)}~${date2text(end)}`;
 }
+/**
+ * 根据 yyyy-mm-dd 的日期获取日期对象
+ *
+ * @param {string} t yyyy-mm-dd 的日期
+ * @returns 日期对象
+ */
+export function getDateByText(t) {
+  const d = t.split('-');
+  d[1] -= 1;
+  return new Date(...d);
+}
 
 export default {
   date2text,
   getWeekStart,
   getWeekEnd,
   getWeekDate,
-  getWeekDateText
+  getWeekDateText,
+  getDateByText
 };

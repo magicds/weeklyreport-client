@@ -1,3 +1,4 @@
+const PREFIX = '/fe-manage/';
 export default function fetchData(url, data) {
   // Default options are marked with *
   const opt = {
@@ -17,5 +18,5 @@ export default function fetchData(url, data) {
     opt.method = 'POST';
     opt.body = JSON.stringify(data);
   }
-  return fetch(url, opt).then(response => response.json()); // parses response to JSON
+  return fetch(/^api/.test(url) ? PREFIX + url : url, opt).then(response => response.json()); // parses response to JSON
 }
