@@ -163,8 +163,12 @@ export default {
               return this.$Message.error('注册失败' + res.message);
             }
 
-            this.$Message.success('注册成功，请等待管理者审批');
-            this.$router.push({name:'login'});
+            this.$Message.success({
+              content:'注册成功，请等待管理者审批',
+              duration: 10,
+              closable: true
+            });
+            this.$router.push('/');
             //
           });
         } else {
