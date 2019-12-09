@@ -72,7 +72,7 @@ export default {
 
       return data.map(item => {
         const name = item.user.name;
-        const extInfo = item.extInfo;
+        const extInfo = item.user.extInfo;
         const { taskList, communicationList, studyList, taskTime, communicationTime } = item.report;
         const workList = [...taskList, ...communicationList, ...studyList];
 

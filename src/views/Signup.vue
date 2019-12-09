@@ -5,7 +5,7 @@
     <i-form ref="signinForm" :model="user" :rules="userRule" :label-width="80">
       <FormItem prop="email" label="邮箱">
         <i-input type="text" v-model="user.email" placeholder="请输入邮箱">
-          <Icon type="ios-mail" slot="prepend"></Icon>
+          <Icon type="ios-mail-outline" slot="prepend"></Icon>
         </i-input>
       </FormItem>
       <FormItem prop="pwd" label="密码">
@@ -18,13 +18,18 @@
           <Icon type="ios-person-outline" slot="prepend"></Icon>
         </i-input>
       </FormItem>
+      <FormItem prop="extInfo" label="姓名">
+        <i-input type="text" v-model="user.extInfo" placeholder="输入您的备注信息，如实习生、试用期等">
+          <Icon type="ios-alert-outline" slot="prepend"></Icon>
+        </i-input>
+      </FormItem>
       <FormItem prop="dept" label="所在部门">
-        <Select v-model="user.dept" prefix="ios-people">
+        <Select v-model="user.dept" prefix="ios-people-outline">
           <Option v-for="item in deptList" :value="item.id" :key="item.id">{{ item.name }}</Option>
         </Select>
       </FormItem>
       <FormItem prop="group" label="所属小组">
-        <Select v-model="user.group" prefix="ios-people">
+        <Select v-model="user.group" prefix="ios-people-outline">
           <Option v-for="item in (deptMap[user.dept] ? deptMap[user.dept].groups: [])" :value="item.id" :key="item.id">{{ item.name }}</Option>
         </Select>
       </FormItem>
@@ -56,6 +61,7 @@ export default {
       groupList: [],
       user: {
         name: '',
+        extInfo: '',
         gender: undefined,
         username: '',
         pwd: '',
@@ -83,13 +89,13 @@ export default {
             trigger: 'blur'
           }
         ],
-        gender: [
-          {
-            required: true,
-            message: '请选择性别',
-            trigger: 'blur'
-          }
-        ],
+        // gender: [
+        //   {
+        //     required: true,
+        //     message: '请选择性别',
+        //     trigger: 'blur'
+        //   }
+        // ],
         dept: [
           {
             required: true,
@@ -104,7 +110,7 @@ export default {
             trigger: 'blur'
           }
         ],
-        email: [{ type: 'email', message: '邮箱格式不正确', trigger: 'blur' }]
+        email: [{ required: true, message: '登录邮箱必填', trigger: 'blur' }, { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }]
       }
     };
   },
