@@ -26,7 +26,8 @@ export default {
       dateRange: {
         start: date2text(getWeekStart(new Date())),
         end: date2text(getWeekEnd(new Date()))
-      }
+      },
+      userList: []
     };
   },
   computed: {
@@ -46,9 +47,32 @@ export default {
     }
   },
   mounted() {
-    this.getData();
+    this.getUserList().then(() => {
+      this.getData();
+    });
   },
   methods: {
+    getUserList() {
+      this.loading = true;
+      return this.$fetch(`api/user/list?dept=${this.user.dept.id}`).then(res => {
+        if (res.code == 200) {
+          this.userList = res.data.map(u => {
+            const extInfo = u.extInfo;
+            return {
+              id: u.id,
+              name: u.name + (extInfo ? `(${extInfo})` : ''),
+              groupId: u.group._id,
+              groupName: u.group.name,
+              deptId: u.dept._id,
+              deptName: u.dept.name,
+              reports: []
+            };
+          });
+        } else {
+          console.error(res.message);
+        }
+      });
+    },
     getData() {
       this.loading = true;
       const cond = {
@@ -68,41 +92,95 @@ export default {
     dealData(data) {
       if (!Array.isArray(data)) return [];
 
+      const userList = JSON.parse(JSON.stringify(this.userList));
+
       // 范围一周以上时的 多条记录的合并
-
-      return data.map(item => {
-        const name = item.user.name;
-        const extInfo = item.user.extInfo;
-        const { taskList, communicationList, studyList, taskTime, communicationTime } = item.report;
-        const workList = [...taskList, ...communicationList, ...studyList];
-
-        const saturationTime = taskTime + communicationTime;
-        
-        const standardTime = 40 * 1;
-        const saturation = parseFloat((saturationTime / standardTime).toFixed(2));
-        
-
-        const obj = {
-          id: item.id,
-          userId: item.user.id || item.user._id,
-          name: name + (extInfo ? `(${extInfo})` : ''),
-          week: item.week,
-          start: item.startDate,
-          end: item.startEnd,
-          taskTime: taskTime,
-          communicationTime: communicationTime,
-          studyTime: item.report.studyTime,
-          leaveTime: item.report.leaveTime,
-          workList: workList,
-          leaveList: item.report.leaveList,
-
-          saturationTime: saturationTime,
-          saturation: saturation,
-          standardTime: standardTime
-        };
-
-        return obj;
+      const logMap = {};
+      data.forEach(item => {
+        const uid = item.user.id || item.user._id;
+        if (!uid) return;
+        if (!logMap[uid]) {
+          logMap[uid] = [item];
+        } else {
+          logMap[uid].push(item);
+        }
       });
+
+      userList.forEach(u => {
+        const uid = u.id;
+        const reports = logMap[uid];
+
+        let summaryReport = {};
+        // 未填
+        if (!reports || !reports.length) {
+          summaryReport = {
+            week: '',
+            // start: item.startDate,
+            // end: item.startEnd,
+            taskTime: 0,
+            communicationTime: 0,
+            studyTime: 0,
+            leaveTime: 0,
+            workList: [],
+            leaveList: [],
+
+            saturationTime: 0,
+            saturation: 0,
+            standardTime: 40
+          };
+        } else {
+          const report = reports[0].report;
+          const { taskList, communicationList, studyList } = report;
+          const workList = [...taskList, ...communicationList, ...studyList];
+          const leaveList = [...report.leaveList];
+
+          let taskTime = report.taskTime;
+          let communicationTime = report.communicationTime;
+          let studyTime = report.studyTime;
+          let leaveTime = report.leaveTime;
+
+          let saturationTime = taskTime + communicationTime;
+
+          // todo 应从工作日中获取
+          let standardTime = 40;
+
+          reports.slice(1).forEach(it => {
+            const r = it.report;
+            workList.push(...r.taskList, ...r.communicationList, ...r.studyList);
+            leaveList.push(...r.leaveList);
+
+            taskTime += r.taskTime;
+            communicationTime += r.communicationTime;
+            studyTime += r.studyTime;
+            leaveTime += r.leaveTime;
+
+            saturationTime += r.taskTime + r.communicationTime;
+            leaveTime += r.leaveTime;
+            // todo 应从工作日中获取
+            standardTime += 40;
+          });
+          const saturation = saturationTime / standardTime;
+          summaryReport = {
+            workList,
+            leaveList,
+
+            taskTime,
+            communicationTime,
+            studyTime,
+            leaveTime,
+
+            saturationTime,
+            standardTime,
+            saturation
+          };
+        }
+
+        Object.keys(summaryReport).forEach(k => {
+          u[k] = summaryReport[k];
+        });
+      });
+      console.log(userList);
+      return userList;
     }
   }
 };
