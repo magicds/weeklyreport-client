@@ -18,7 +18,7 @@
           <Icon type="ios-person-outline" slot="prepend"></Icon>
         </i-input>
       </FormItem>
-      <FormItem prop="extInfo" label="姓名">
+      <FormItem prop="extInfo" label="备注信息">
         <i-input type="text" v-model="user.extInfo" placeholder="输入您的备注信息，如实习生、试用期等">
           <Icon type="ios-alert-outline" slot="prepend"></Icon>
         </i-input>

@@ -7,7 +7,7 @@
       <router-link :to="{ name: 'person'}" class="nav-link" v-if="user.role >= 100">人员管理</router-link>
     </div>
 
-    <UserIcon class="header-user-icon" :data="user" :ext-items="[]" :onItemClick="onItemClick" />
+    <UserIcon class="header-user-icon" :data="user" :ext-items="extItems" :onItemClick="onItemClick" />
   </nav>
 </template>
 
@@ -19,7 +19,15 @@ export default {
     UserIcon
   },
   props: {
-    user: Object
+    user: Object,
+    extItems: {
+      type: Array,
+      default: () => []
+    },
+    onItemClick: {
+      type: Function,
+      default: () => {}
+    }
   },
   data() {
     return {};
@@ -34,13 +42,6 @@ export default {
           this.$Message.error(res.message);
         }
       });
-    },
-    onItemClick(type) {
-      if (type == 'logout') {
-        return this.logout();
-      } else {
-        return alert('功能即将上线，请稍后');
-      }
     }
   }
 };

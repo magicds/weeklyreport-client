@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import store from "../store/";
+import store from '../store/';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Signup from '../views/Signup.vue';
@@ -10,16 +10,17 @@ import Input from '../views/Input.vue';
 import Summary from '../views/Summary.vue';
 import DeptManage from '../views/DeptManage.vue';
 import StaffList from '../views/StaffList.vue';
+import Verify from '../views/Verify.vue';
 
 Vue.use(VueRouter);
 
 function anonymityAccess(to) {
-  return ["signup", "login", "home", "resetpwd"].indexOf(to.name) !== -1;
+  return ['signup', 'login', 'home', 'resetpwd'].indexOf(to.name) !== -1;
 }
 function adminRequired(to, from, next) {
   console.log(store.state);
   const user = store.state.currentUserData;
-  next()
+  next();
   // if (user.level >= 100) {
   //   next();
   // } else {
@@ -67,6 +68,11 @@ const routes = [
         component: Summary
       },
       {
+        path: 'verify',
+        name: 'verify',
+        component: Verify
+      },
+      {
         path: 'dept',
         name: 'dept',
         component: DeptManage
@@ -111,7 +117,7 @@ router.beforeEach((to, from, next) => {
   } else {
     // 到登录
     next({
-      name: "login",
+      name: 'login',
       params: {
         originPath: to.path
       }
