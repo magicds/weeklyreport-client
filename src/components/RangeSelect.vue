@@ -45,7 +45,7 @@ function getYearQuarter(year, startQ = 1, endQ = 4) {
 
 function getDateRange(weeks, toPrev) {
   const d = new Date();
-  const prev = d.setDate(d.getDate() - 7 * weeks);
+  const prev = new Date(d).setDate(d.getDate() - 7 * weeks);
   const startDate = getWeekStart(prev);
 
   const endDate = toPrev ? getWeekEnd(prev) : getWeekEnd(d);
@@ -89,21 +89,21 @@ export default {
             }
           },
           {
-            text: '最近2周',
+            text: '最近二周',
             value() {
-              return getDateRange(2);
+              return getDateRange(1);
             }
           },
           {
             text: '最近三周',
             value() {
-              return getDateRange(3);
+              return getDateRange(2);
             }
           },
           {
             text: '最近四周',
             value() {
-              return getDateRange(4);
+              return getDateRange(3);
             }
           }
         ]

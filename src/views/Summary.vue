@@ -2,10 +2,11 @@
   <div>
     <div style="margin-bottom:16px;">
       <RangeSelect v-model="dateRange" class="mr-m" />
+      <Button :loading="loading" @click="getData()">查询</Button>
       <span>{{dateRange.start}} ~ {{dateRange.end}} {{weeksText}}</span>
     </div>
-    <SummaryChart :loading="loading" :data="list" :show-content="weeks > 3" style="margin-bottom:16px;" />
-    <SummaryTable :loading="loading" :data="list" />
+    <SummaryChart :loading="loading" :data="list" style="margin-bottom:16px;" />
+    <SummaryTable :loading="loading" :data="list" :weeks="weeks" />
   </div>
 </template>
 
