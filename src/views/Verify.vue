@@ -135,7 +135,7 @@ export default {
       });
     },
     getVerifyLog() {
-      return this.$fetch('api/user/verifylog').then(res => {
+      return this.$fetch('api/user/verifylog?limit=20').then(res => {
         if (res.code == 200) {
           return res.data;
         } else {
@@ -197,6 +197,9 @@ export default {
 .verify-log-item {
   line-height: 30px;
   margin-bottom: 6px;
+}
+.verify-log-item > *{
+  margin-right: 8px;
 }
 .no-logs {
   text-align: center;
