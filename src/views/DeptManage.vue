@@ -28,7 +28,7 @@
           </i-col>
           <i-col class="group-item add" :lg="{span:8}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}">
             <Card class="group-card add">
-              <Icon class="add-icon" type="ios-add" @click="showGroupDialog('add', dept.id)" title="新增小组"/>
+              <Icon class="add-icon" type="ios-add" @click="showGroupDialog('add', dept.id)" title="新增小组" />
             </Card>
           </i-col>
         </Row>
@@ -276,15 +276,21 @@ export default {
         title: '系统警告',
         content: '确定删除此部门，删除后此部门的所有数据将丢失，是否继续',
         onOk() {
-          that.$fetch('dept/remove', { id: dept.id }).then(res => {
-            if (res.code === 200) {
-              that.$Message.success('删除成功');
-              that.getData();
-            } else {
-              that.$Message.error(res.message);
-            }
-            that.$Modal.remove();
-          });
+          that
+            .$fetch('api/dept/remove', { id: dept.id })
+            .then(res => {
+              if (res.code === 200) {
+                that.$Message.success('删除成功');
+                that.getData();
+              } else {
+                that.$Message.error(res.message);
+              }
+              that.$Modal.remove();
+            })
+            .catch(err => {
+              that.$Message.error(err.message);
+              that.$Modal.remove();
+            });
         }
       });
     },
@@ -296,15 +302,21 @@ export default {
         title: '系统警告',
         content: '确定删除此小组，删除后此小组的所有数据将丢失，是否继续',
         onOk() {
-          that.$fetch('group/remove', { id: group.id }).then(res => {
-            if (res.code === 200) {
-              that.getData();
-              that.$Message.success('删除成功');
-            } else {
-              that.$Message.error(res.message);
-            }
-            that.$Modal.remove();
-          });
+          that
+            .$fetch('api/group/remove', { id: group.id })
+            .then(res => {
+              if (res.code === 200) {
+                that.getData();
+                that.$Message.success('删除成功');
+              } else {
+                that.$Message.error(res.message);
+              }
+              that.$Modal.remove();
+            })
+            .catch(err => {
+              that.$Message.error(err.message);
+              that.$Modal.remove();
+            });
         }
       });
     }

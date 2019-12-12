@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="staff-manage">
     <nav class="dept-nav" v-if="deptUserTree.length > 1">
       <span class="dept-nav-item" :class="{'active': activeId === dept.id}" @click="activeId = dept.id" :data-target="dept.id" v-for="dept in deptUserTree" :key="dept.id">{{dept.name}}</span>
     </nav>
@@ -8,9 +8,9 @@
       <div class="dept-item" v-for="dept in deptUserTree" :key="dept.id" :data-key="dept.id">
         <h3 class="dept-name">{{dept.name}}</h3>
         <Row :gutter="16" v-if="dept.members && dept.members.length">
-          <i-col :lg="{span:8}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in dept.members" :key="user.id">
+          <i-col class="card-wrap" :lg="{span:8}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in dept.members" :key="user.id">
             <Card>
-              <UserCard :user="user" />
+              <UserCard :user="user" @refresh="getData" />
             </Card>
           </i-col>
         </Row>
@@ -53,10 +53,10 @@ export default {
         dept.members = dept.groups
           .map(group => {
             const groupLeader = group.leader ? group.leader.id : false;
-            group.members.forEach(user=>{
+            group.members.forEach(user => {
               user.isDeptLeader = user.id === deptLeader;
               user.isGroupLeader = user.id === groupLeader;
-            })
+            });
             return group.members;
           })
           .flat();
@@ -68,6 +68,13 @@ export default {
   },
   mounted() {
     this.getData();
+  },
+  provide() {
+    return {
+      getDeptList: () => {
+        return this.deptList;
+      }
+    };
   },
   methods: {
     getData() {
@@ -89,9 +96,14 @@ export default {
 </script>
 
 <style socped lang="scss">
-
+.staff-manage {
+  padding-bottom: 32px;
+}
 .dept-empty {
   margin: 8px 0;
   color: #999;
+}
+.card-wrap {
+  margin-bottom: 16px;
 }
 </style>
