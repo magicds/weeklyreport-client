@@ -11,6 +11,7 @@ import Summary from '../views/Summary.vue';
 import DeptManage from '../views/DeptManage.vue';
 import StaffList from '../views/StaffList.vue';
 import Verify from '../views/Verify.vue';
+import UserInfo from '../views/UserInfo.vue';
 
 Vue.use(VueRouter);
 
@@ -81,12 +82,12 @@ const routes = [
         path: 'person',
         name: 'person',
         component: StaffList
+      },
+      {
+        path:'userinfo',
+        name:'userinfo',
+        component: UserInfo
       }
-      // {
-      //   path:'userinfo',
-      //   name:'userinfo',
-      //   component: UserInfo
-      // }
     ]
   },
   {

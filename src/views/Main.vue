@@ -25,10 +25,8 @@ export default {
     onItemClick(type) {
       if (type == 'logout') {
         return this.logout();
-      } else if (type == 'verify') {
-        return this.$router.push({ name: 'verify' });
-      } else {
-        return alert('功能即将上线，请稍后');
+      } else if (type == 'verify' || type == 'userinfo') {
+        return this.$router.push({ name: type });
       }
     }
   }

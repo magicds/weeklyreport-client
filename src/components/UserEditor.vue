@@ -4,7 +4,6 @@
       <i-input type="text" readonly v-model="editData.email" placeholder="请输入邮箱">
         <Icon type="ios-mail-outline" slot="prepend"></Icon>
       </i-input>
-      <Button @click="resetPwd(editData.email)">重置密码</Button>
     </FormItem>
     <FormItem prop="name" label="姓名">
       <i-input type="text" v-model="editData.name" placeholder="请输入姓名">
@@ -123,9 +122,6 @@ export default {
         }
       });
       return data;
-    },
-    resetPwd(email) {
-      this.$emit('reset-pwd', email);
     }
   }
 };

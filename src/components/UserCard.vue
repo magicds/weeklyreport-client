@@ -33,7 +33,10 @@
 
       <div class="item">
         <Icon class="mr-s" type="ios-mail"></Icon>
-        <span>{{user.email}}</span>
+        <p class="email-block">
+          {{user.email}}
+          <Button class="reset-pwd-btn" @click="resetPwd(user.email)">重置密码</Button>
+        </p>
       </div>
 
       <div class="item">
@@ -97,7 +100,7 @@ export default {
           if (res.code == 200) {
             this.editDialogShow = false;
             this.$Message.success('保存成功');
-            this.refresh();
+            this.refresh(res.data);
           } else {
             throw new Error(res.message);
           }
@@ -118,7 +121,7 @@ export default {
               if (res.code == 200) {
                 this.$Message.success('删除成功');
                 this.$Modal.remove();
-                this.refresh();
+                this.refresh(res.data);
               } else {
                 throw new Error(res.message);
               }
@@ -130,8 +133,11 @@ export default {
         }
       });
     },
-    refresh() {
-      this.$emit('refresh');
+    refresh(data) {
+      this.$emit('refresh', data);
+    },
+    resetPwd(email) {
+      alert('即将到来' + email);
     }
   }
 };
@@ -189,6 +195,16 @@ export default {
     pointer-events: auto;
     opacity: 1;
     transform: translateY(0);
+  }
+  .email-block {
+    display: inline-block;
+  }
+  .reset-pwd-btn {
+    opacity: 0;
+    transition: all 0.2s ease-out;
+  }
+  &:hover .reset-pwd-btn {
+    opacity: 1;
   }
 }
 </style>

@@ -8,7 +8,7 @@
       <div class="dept-item" v-for="dept in deptUserTree" :key="dept.id" :data-key="dept.id">
         <h3 class="dept-name">{{dept.name}}</h3>
         <Row :gutter="16" v-if="dept.members && dept.members.length">
-          <i-col class="card-wrap" :lg="{span:8}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in dept.members" :key="user.id">
+          <i-col class="card-wrap" :xl="8" :lg="{span:12}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in dept.members" :key="user.id">
             <Card>
               <UserCard :user="user" @refresh="getData" />
             </Card>
@@ -20,7 +20,7 @@
 
     <!-- 游离人员 -->
     <Row class="other-user-list" :gutter="16" v-if="otherUsers && otherUsers.length">
-      <i-col :lg="{span:8}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in otherUsers" :key="user.id">
+      <i-col :lg="{span:8}" :xl="8" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in otherUsers" :key="user.id">
         <Card>
           <UserCard :user="user" />
         </Card>
