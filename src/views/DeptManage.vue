@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="dept-manange">
     <nav class="dept-nav" v-if="deptList.length > 1">
       <span class="dept-nav-item" :class="{'active': activeId === dept.id}" @click="activeId = dept.id" :data-target="dept.id" v-for="dept in deptList" :key="dept.id">{{dept.name}}</span>
     </nav>
@@ -16,7 +16,7 @@
             <Card class="group-card">
               <p class="line">组名：{{group.name}}</p>
               <p class="line">
-                <span>组长：{{group.leader ? group.leader.name : ''}}</span>
+                <span style="width: 100px">组长：{{group.leader ? group.leader.name : ''}}</span>
                 <span>组员：{{group.members ? group.members.length : 0}}</span>
               </p>
               <!-- <Icon class="edit-btn"  type="ios-create-outline" @click="showGroupDialog('edit', dept.id, group)" /> -->
@@ -28,14 +28,14 @@
           </i-col>
           <i-col class="group-item add" :lg="{span:8}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}">
             <Card class="group-card add">
-              <Icon class="add-icon" type="ios-add" @click="showGroupDialog('add', dept.id)" />
+              <Icon class="add-icon" type="ios-add" @click="showGroupDialog('add', dept.id)" title="新增小组"/>
             </Card>
           </i-col>
         </Row>
       </div>
     </div>
 
-    <Button type="text" icon="ios-add" @click="showDeptDialog('add')">创建新部门</Button>
+    <Button size="large" icon="md-add" @click="showDeptDialog('add')">创建新部门</Button>
 
     <!-- 部门编辑 -->
     <Modal :title="deptEditInfo.title" v-model="deptEditInfo.show" :loading="true" @on-ok="saveDept">
@@ -318,6 +318,9 @@ export default {
 </script>
 
 <style lang="scss">
+.dept-manange {
+  padding-bottom: 32px;
+}
 .dept-nav {
   line-height: 40px;
   &-item {
@@ -328,6 +331,9 @@ export default {
       color: #2d8cf0;
     }
   }
+}
+.dept-list {
+  margin-bottom: 20px;
 }
 .dept-item {
   margin-top: 32px;
@@ -351,6 +357,9 @@ export default {
   }
   .line {
     line-height: ($height - $padding * 2) / 2;
+    > span {
+      display: inline-block;
+    }
   }
   .group-btn-warp {
     position: absolute;
