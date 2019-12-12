@@ -17,6 +17,9 @@ Vue.prototype.$fetch = fetchData;
 Vue.filter('toInt', function(v = '') {
   return parseInt(v.toFixed(0), 10);
 });
+Vue.filter('toPercent', function(v = 0) {
+  return (v * 100).toFixed(0) + '%';
+});
 Vue.filter('shortName', function(v = '') {
   return v.substr(-2);
 });

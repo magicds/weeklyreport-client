@@ -1,19 +1,29 @@
 <template>
-  <Table class="summary-table" :columns="columns" :data="data" :loading="loading" :class="{'show-content': !showContent}"></Table>
+  <Table class="summary-table" :columns="weeks > 1 ? column2 : column1" :data="data" :loading="loading" :class="{'show-content': weeks > 1}">
+    <template slot-scope="{ row }" slot="percent">{{row.saturation | toPercent}}</template>
+    <template slot-scope="{ row }" slot="workList">
+      <ListDisplay :data="row.workList" />
+    </template>
+    <template slot-scope="{ row }" slot="leaveList">
+      <ListDisplay :data="row.leaveList" />
+    </template>
+  </Table>
 </template>
 
 <script>
 import ExpandRow from './ExpandRow';
+import ListDisplay from './ListDisplay';
 export default {
   name: 'summary-table',
   components: {
     // eslint-disable-next-line
-    ExpandRow
+    ExpandRow,
+    ListDisplay
   },
   props: {
-    showContent: {
-      type: Boolean,
-      default: true
+    weeks: {
+      type: Number,
+      default: 1
     },
     loading: {
       type: Boolean,
@@ -26,7 +36,19 @@ export default {
   },
   data() {
     return {
-      columns: [
+      column1: [
+        { title: '姓名', key: 'name', sortable: true, width: 90 },
+        { title: '工作内容', key: 'workList', slot: 'workList' },
+        { title: '任务耗时', key: 'taskTime', sortable: true, width: 100 },
+        { title: '沟通耗时', key: 'communicationTime', sortable: true, width: 100 },
+        { title: '学习耗时', key: 'studyTime', sortable: true, width: 100 },
+        { title: '饱和度', key: 'saturation', sortable: true, width: 100, slot: 'percent' },
+        { title: '备注', key: 'leaveList', slot: 'leaveList' }
+      ].map(c => {
+        c.className = 'summary-column ' + (c.key || c.type);
+        return c;
+      }),
+      column2: [
         {
           type: 'expand',
           slot: 'content',
@@ -38,13 +60,11 @@ export default {
           }
         },
         { title: '姓名', key: 'name', sortable: true, width: 90 },
-        // { title: '工作内容', key: 'workList' },
         { title: '任务耗时', key: 'taskTime', sortable: true, width: 100 },
         { title: '沟通耗时', key: 'communicationTime', sortable: true, width: 100 },
         { title: '学习耗时', key: 'studyTime', sortable: true, width: 100 },
         { title: '请假耗时', key: 'leaveTime', sortable: true, width: 100 },
-        { title: '饱和度', key: 'saturation', sortable: true, width: 100 },
-        // { title: '备注', key: 'leaveList' },
+        { title: '饱和度', key: 'saturation', sortable: true, width: 100, slot: 'percent' },
         { title: '时间范围', key: 'weekRange' }
       ].map(c => {
         c.className = 'summary-column ' + (c.key || c.type);

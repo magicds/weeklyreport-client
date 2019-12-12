@@ -1,9 +1,18 @@
 <template>
-  <div>
-    <div style="margin-bottom:16px;">
-      <RangeSelect v-model="dateRange" class="mr-m" />
-      <Button :loading="loading" @click="getData()">查询</Button>
-      <span>{{dateRange.start}} ~ {{dateRange.end}} {{weeksText}}</span>
+  <div class="summary-report">
+    <div class="summary-report-header">
+      <div>
+        <RangeSelect v-model="dateRange" class="mr-m" />
+        <Button type="primary" :loading="loading" @click="getLog">查询</Button>
+      </div>
+      <span class="summary-report-title">{{summaryTitle}}</span>
+      <div class="summary-report-action">
+        <Select v-model="targetDept" v-if="deptList.length " style="text-align: left; width:80px" @on-change="getData">
+          <Option v-for="item in deptList" :key="item.id" :value="item.id">{{item.name}}</Option>
+        </Select>
+        <Button :loading="exportLoading" @click="exportData">人员</Button>
+        <Button type="primary" :loading="exportLoading" @click="exportData">导出</Button>
+      </div>
     </div>
     <SummaryChart :loading="loading" :data="list" style="margin-bottom:16px;" />
     <SummaryTable :loading="loading" :data="list" :weeks="weeks" />
@@ -28,7 +37,11 @@ export default {
         start: date2text(getWeekStart(new Date())),
         end: date2text(getWeekEnd(new Date()))
       },
-      userList: []
+      userList: [],
+      exportLoading: false,
+      summaryTitle: '',
+      targetDept: '',
+      deptList: []
     };
   },
   computed: {
@@ -48,14 +61,16 @@ export default {
     }
   },
   mounted() {
-    this.getUserList().then(() => {
-      this.getData();
-    });
+    if (this.user.dept) {
+      this.targetDept = this.user.dept.id;
+    }
+    this.getDeptList();
+    this.getData();
   },
   methods: {
     getUserList() {
       this.loading = true;
-      return this.$fetch(`api/user/list?dept=${this.user.dept.id}`).then(res => {
+      return this.$fetch(`api/user/list?dept=${this.targetDept || this.user.dept.id}`).then(res => {
         if (res.code == 200) {
           this.userList = res.data.map(u => {
             const extInfo = u.extInfo;
@@ -74,11 +89,30 @@ export default {
         }
       });
     },
+    getDeptList() {
+      if (this.user.role <= 100) {
+        this.deptList = [];
+        return;
+      }
+      this.$fetch('api/dept/list').then(res => {
+        if (res.code == 200) {
+          this.deptList = res.data;
+        } else {
+          this.deptList = [];
+        }
+      });
+    },
     getData() {
+      this.getUserList().then(() => {
+        this.getLog();
+      });
+    },
+    getLog() {
+      this.setSummaryTitle();
       this.loading = true;
       const cond = {
         ...this.dateRange,
-        dept: this.user.dept.id
+        dept: this.targetDept || this.user.dept.id
       };
       this.$fetch('api/weeklyLog/weekRange', cond).then(res => {
         if (res.code === 200) {
@@ -116,6 +150,7 @@ export default {
         if (!reports || !reports.length) {
           summaryReport = {
             week: '',
+            weeks: 0,
             // start: item.startDate,
             // end: item.startEnd,
             taskTime: 0,
@@ -130,6 +165,10 @@ export default {
             standardTime: 40
           };
         } else {
+          reports.sort((a, b) => {
+            if (a.startDate == b.startDate) return 0;
+            return +new Date(a.startDate) - +new Date(b.startDate) < 0 ? -1 : 1;
+          });
           const report = reports[0].report;
           const { taskList, communicationList, studyList } = report;
           const workList = [...taskList, ...communicationList, ...studyList];
@@ -141,6 +180,9 @@ export default {
           let leaveTime = report.leaveTime;
 
           let saturationTime = taskTime + communicationTime;
+
+          let startDate = reports[0].startDate;
+          let endDate = reports[0].endDate;
 
           // todo 应从工作日中获取
           let standardTime = 40;
@@ -159,9 +201,11 @@ export default {
             leaveTime += r.leaveTime;
             // todo 应从工作日中获取
             standardTime += 40;
+            endDate = it.endDate;
           });
           const saturation = saturationTime / standardTime;
           summaryReport = {
+            weeks: reports.length,
             workList,
             leaveList,
 
@@ -172,20 +216,49 @@ export default {
 
             saturationTime,
             standardTime,
-            saturation
+            saturation,
+
+            startDate,
+            endDate
           };
         }
 
         Object.keys(summaryReport).forEach(k => {
           u[k] = summaryReport[k];
         });
+        if (u.startDate && u.endDate) {
+          u.weekRange = date2text(new Date(u.startDate)) + '~' + date2text(new Date(u.endDate));
+
+          if (this.weeks > 1 && u.weeks) {
+            u.weekRange += `(共计${u.weeks}周)`;
+          }
+        }
       });
       console.log(userList);
       return userList;
+    },
+    setSummaryTitle() {
+      this.summaryTitle = `${this.dateRange.start} ~ ${this.dateRange.end} ${this.weeksText}`;
+    },
+    exportData() {
+      alert('即将到来');
     }
   }
 };
 </script>
 
-<style>
+<style lang="scss">
+.summary-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.summary-report-action {
+  // width: 140px;
+  text-align: right;
+  > * {
+    margin-left: 8px;
+  }
+}
 </style>

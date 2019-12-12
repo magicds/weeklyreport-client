@@ -89,12 +89,15 @@ export default {
               return prefix + ': ' + v + '%';
             }
             const { saturationTime, standardTime } = userInfoMap[item.name];
+            const addTime = saturationTime - standardTime;
 
             return [
               // prettier-ignore
               item.marker + item.name + '<br/>' + item.seriesName + ': ' + v + '%',
               // prettier-ignore
-              `<br>工作总时间：${saturationTime}h<br> 标准工作时间：${standardTime}h<br> 加班时间：${saturationTime - standardTime}h`
+              `<br>工作总时间：${saturationTime}h`,
+              `<br> 标准工作时间：${standardTime}h`,
+              addTime > 0 ? `<br> 加班时间：${addTime}h` : '',
             ].join('');
           }
         },
