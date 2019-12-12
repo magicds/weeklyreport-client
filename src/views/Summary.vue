@@ -10,12 +10,16 @@
         <Select v-model="targetDept" v-if="deptList.length " style="text-align: left; width:80px" @on-change="getData">
           <Option v-for="item in deptList" :key="item.id" :value="item.id">{{item.name}}</Option>
         </Select>
-        <Button :loading="exportLoading" @click="exportData">人员</Button>
+        <Button :loading="exportLoading" @click="showFilterDialog = true">人员</Button>
         <Button type="primary" :loading="exportLoading" @click="exportData">导出</Button>
       </div>
     </div>
-    <SummaryChart :loading="loading" :data="list" style="margin-bottom:16px;" />
-    <SummaryTable :loading="loading" :data="list" :weeks="weeks" />
+    <SummaryChart :loading="loading" :data="filterdList" style="margin-bottom:16px;" />
+    <SummaryTable :loading="loading" :data="filterdList" :weeks="weeks" />
+
+    <Modal title="请选择要显示的人员" v-model="showFilterDialog" okText="过滤" @on-ok="doFilter">
+      <Tree :data="treeData" ref="tree" show-checkbox multiple></Tree>
+    </Modal>
   </div>
 </template>
 
@@ -26,6 +30,9 @@ import SummaryChart from '@/components/SummaryChart';
 import RangeSelect from '@/components/RangeSelect';
 
 const WEEK_MILLISECONDS = 1000 * 60 * 60 * 24 * 7;
+
+const LOCAL_KEY = 'HIDDEN_USER_MAP';
+
 export default {
   name: 'week-summary',
   components: { RangeSelect, SummaryTable, SummaryChart },
@@ -41,7 +48,9 @@ export default {
       exportLoading: false,
       summaryTitle: '',
       targetDept: '',
-      deptList: []
+      deptList: [],
+      hiddenUserIdMap: {},
+      showFilterDialog: false
     };
   },
   computed: {
@@ -58,11 +67,61 @@ export default {
     weeksText() {
       if (this.weeks <= 1) return '';
       return `(共${this.weeks}周)`;
+    },
+    treeData() {
+      if (!this.userList.length) {
+        return [];
+      }
+      const hideUser = this.hiddenUserIdMap;
+      // const hideUser = { '5de7884019186c688095d0b9': true };
+      const groupMap = new Map();
+      this.userList.forEach(u => {
+        const gid = u.groupId;
+        const itemData = groupMap.get(gid);
+        if (!itemData) {
+          groupMap.set(gid, {
+            title: u.groupName,
+            isGroup: true,
+            expand: true,
+            children: [
+              {
+                id: u.id,
+                title: u.name,
+                checked: hideUser[u.id] ? false : true
+              }
+            ]
+          });
+        } else {
+          itemData.children.push({
+            id: u.id,
+            title: u.name,
+            checked: hideUser[u.id] ? false : true
+          });
+        }
+      });
+
+      return [...groupMap.values()].map(group => {
+        group.checked = group.children.every(item => item.checked);
+        return group;
+      });
+    },
+    filterdList() {
+      if (!this.list.length) return [];
+      const hide = this.hiddenUserIdMap;
+      return this.list.filter(u => !hide[u.id]);
     }
   },
   mounted() {
     if (this.user.dept) {
       this.targetDept = this.user.dept.id;
+    }
+    try {
+      let localData = JSON.parse(localStorage.getItem(LOCAL_KEY + '-' + this.targetDept));
+      if (localData && typeof localData == 'object') {
+        this.hiddenUserIdMap = localData;
+      }
+    } catch (error) {
+      console.error(error);
     }
     this.getDeptList();
     this.getData();
@@ -239,6 +298,23 @@ export default {
     },
     setSummaryTitle() {
       this.summaryTitle = `${this.dateRange.start} ~ ${this.dateRange.end} ${this.weeksText}`;
+    },
+    doFilter() {
+      const checkeds = this.$refs.tree.getCheckedNodes().filter(node => !node.isGroup);
+      // 默认全部隐藏
+      const hide = this.userList.reduce((t, u) => {
+        t[u.id] = true;
+        return t;
+      }, {});
+      // 再将要显示的去掉
+      checkeds.forEach(node => {
+        delete hide[node.id];
+      });
+      // save
+      localStorage.setItem(LOCAL_KEY + '-' + this.targetDept, JSON.stringify(hide));
+      this.hiddenUserIdMap = hide;
+
+      this.showFilterDialog = false;
     },
     exportData() {
       alert('即将到来');
