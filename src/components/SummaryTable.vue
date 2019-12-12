@@ -96,6 +96,9 @@ export default {
   // &.show-content {
 
   // }
+  .ivu-table-expanded-cell {
+    background: #fcfcfc;
+  }
 }
 .summary-column .ivu-table-cell {
   padding-left: 8px;

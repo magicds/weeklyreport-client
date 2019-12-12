@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <ul v-if="data.length">
+  <div >
+    <ul v-if="data.length" style="padding:8px 0;">
       <li v-for="item in data" :key="item.id">
         <Tag v-if="item.type">{{typeName[item.type]}}</Tag>
         {{item.content}}

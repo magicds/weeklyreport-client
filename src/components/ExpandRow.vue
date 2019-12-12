@@ -1,6 +1,6 @@
 <template>
-  <Row>
-    <i-col  :sm="{span:12}" :xs="{span:24}">
+  <Row type="flex" style="align-items: center;">
+    <i-col :sm="{span:12}" :xs="{span:24}">
       <ul v-if="row.workList.length">
         <li v-for="item in row.workList" :key="item.id">
           <Tag>{{typeName[item.type]}}</Tag>
@@ -10,10 +10,11 @@
       </ul>
       <span v-else>无</span>
     </i-col>
-    <i-col  :sm="{span:12}" :xs="{span:24}">
+    <i-col :sm="{span:12}" :xs="{span:24}">
       <ul v-if="row.leaveList.length">
         <li v-for="item in row.leaveList" :key="item.id">
-          {{item.content}}<span v-if="item.showTime">({{item.time}}h)</span>
+          {{item.content}}
+          <span v-if="item.showTime">({{item.time}}h)</span>
         </li>
       </ul>
       <span v-else>无</span>
