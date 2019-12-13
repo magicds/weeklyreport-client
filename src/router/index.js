@@ -18,19 +18,28 @@ Vue.use(VueRouter);
 function anonymityAccess(to) {
   return ['signup', 'login', 'home', 'resetpwd'].indexOf(to.name) !== -1;
 }
-function adminRequired(to, from, next) {
-  console.log(store.state);
-  const user = store.state.currentUserData;
-  next();
-  // if (user.level >= 100) {
-  //   next();
-  // } else {
-  //   if (store.state.isLogin) {
-  //     alert("您无权限访问此页面");
-  //   }
-  //   console.error("无权限");
-  //   next("/login");
-  // }
+function biggerThanGroup(to, from, next) {
+  console.log('admin check 1');
+  const user = store.state.userData;
+  // next();
+  if (user && user.role >= 10) {
+    next();
+  } else {
+    alert('无权限');
+    next('/login');
+  }
+}
+function biggerThenDept(to, from, next) {
+  console.log('admin check 2');
+  const user = store.state.userData;
+  // next();
+  if (user && user.role >= 10) {
+    
+    next();
+  } else {
+    alert('无权限');
+    next('/login');
+  }
 }
 const routes = [
   {
@@ -71,21 +80,24 @@ const routes = [
       {
         path: 'verify',
         name: 'verify',
-        component: Verify
+        component: Verify,
+        beforeEnter: biggerThanGroup
       },
       {
         path: 'dept',
         name: 'dept',
-        component: DeptManage
+        component: DeptManage,
+        beforeEnter: biggerThenDept
       },
       {
         path: 'person',
         name: 'person',
-        component: StaffList
+        component: StaffList,
+        beforeEnter: biggerThanGroup
       },
       {
-        path:'userinfo',
-        name:'userinfo',
+        path: 'userinfo',
+        name: 'userinfo',
         component: UserInfo
       }
     ]

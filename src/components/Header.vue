@@ -3,8 +3,8 @@
     <div class="left">
       <router-link :to="{ name: 'input'}" class="nav-link" v-if="!user.noReport">周报填写</router-link>
       <router-link :to="{ name: 'summary'}" class="nav-link">周报汇总</router-link>
-      <router-link :to="{ name: 'dept'}" class="nav-link" v-if="user.role >= 100">部门管理</router-link>
-      <router-link :to="{ name: 'person'}" class="nav-link" v-if="user.role >= 100">人员管理</router-link>
+      <router-link :to="{ name: 'dept'}" class="nav-link" v-if="user.role >= 10">部门管理</router-link>
+      <router-link :to="{ name: 'person'}" class="nav-link" v-if="user.role >= 10">人员管理</router-link>
     </div>
 
     <UserIcon class="header-user-icon" :data="user" :ext-items="extItems" :onItemClick="onItemClick" />

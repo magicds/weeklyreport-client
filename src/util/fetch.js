@@ -1,4 +1,4 @@
-const PREFIX = '/fe-manage/';
+const PREFIX = '/weeklyreport-new/';
 export default function fetchData(url, data) {
   // Default options are marked with *
   const opt = {

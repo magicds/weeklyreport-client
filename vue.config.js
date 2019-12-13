@@ -1,4 +1,5 @@
 module.exports = {
+  publicPath: '/weeklyreport-new',
   productionSourceMap: false,
   transpileDependencies: ['vue-echarts', 'resize-detector'],
   devServer: {
