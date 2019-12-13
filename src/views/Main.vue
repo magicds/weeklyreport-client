@@ -28,6 +28,16 @@ export default {
       } else if (type == 'verify' || type == 'userinfo') {
         return this.$router.push({ name: type });
       }
+    },
+    logout() {
+      return this.$fetch('api/user/logout').then(res => {
+        if (res.code == 200) {
+          this.$store.commit('updateUserData', { data: null });
+          this.$router.push('/');
+        } else {
+          this.$Message.error(res.message);
+        }
+      });
     }
   }
 };

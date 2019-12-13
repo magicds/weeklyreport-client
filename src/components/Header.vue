@@ -31,18 +31,6 @@ export default {
   },
   data() {
     return {};
-  },
-  methods: {
-    logout() {
-      return this.$fetch('api/user/logout').then(res => {
-        if (res.code == 200) {
-          this.$store.commit('updateUserData', { data: null });
-          this.$router.push('/');
-        } else {
-          this.$Message.error(res.message);
-        }
-      });
-    }
   }
 };
 </script>

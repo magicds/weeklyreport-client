@@ -107,7 +107,11 @@ export default {
                 this.$router.push({ name: 'input' });
               } else {
                 this.$store.commit('updateUserData', { data: null });
-                this.$Message.error(res.message);
+                this.$Message.error({
+                  content: res.message,
+                  closable: true,
+                  duration: 10
+                });
               }
               console.log(res);
             })
@@ -127,5 +131,16 @@ export default {
 };
 </script>
 
-<style>
+
+<style scoped lang="scss">
+.login-box {
+  padding-top: 32px;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  .ivu-form {
+    text-align: left;
+  }
+}
 </style>

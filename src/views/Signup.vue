@@ -159,7 +159,7 @@ export default {
       this.$refs[name].validate(valid => {
         if (valid) {
           this.$fetch('api/user/signup', {...this.user}).then(res => {
-            if (res.code == 200) {
+            if (res.code != 200) {
               return this.$Message.error('注册失败' + res.message);
             }
 
@@ -182,6 +182,7 @@ export default {
 
 <style scoped lang="scss">
 .signin-box {
+  padding-top: 32px;
   width: 400px;
   margin-left: auto;
   margin-right: auto;
