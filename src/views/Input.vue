@@ -357,17 +357,34 @@ export default {
         }
       });
     },
-    deleteItem(row, index) {
-      this[row.type + 'List'].splice(index, 1);
+    findItemIndex(list, item) {
+      let i = -1;
+      for (let len = list.length - 1; len >= 0; len--) {
+        if (list[len].id == item.id) {
+          i = len;
+          break;
+        }
+      }
+      return i;
     },
-    editItem(row, index) {
+    deleteItem(row) {
+      let idx = this.findItemIndex(this[row.type + 'List'], row);
+      if (idx === -1) {
+        return;
+      }
+      this[row.type + 'List'].splice(idx, 1)[0];
+    },
+    editItem(row) {
       if (this.data.content.trim() || this.data.time) {
         this.$Message.warning('请先处理当前正在输入的内容');
         return;
       }
 
-      let currData = this[row.type + 'List'].splice(index, 1)[0];
-
+      let idx = this.findItemIndex(this[row.type + 'List'], row);
+      if (idx === -1) {
+        return;
+      }
+      let currData = this[row.type + 'List'].splice(idx, 1)[0];
       console.log(currData);
       this.type = currData.type;
       this.data.content = currData.content;
