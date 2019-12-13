@@ -1,0 +1,55 @@
+@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+  .table-support-mobile {
+    /* Force table to not be like tables anymore */
+    &,
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+      display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    tr {
+      // border: 1px solid #ccc;
+      border: none;
+      margin-bottom: 10px;
+      &:last-child  {
+        margin-bottom: 0;
+      }
+    }
+
+    td {
+      /* Behave  like a "row" */
+      border: none;
+      border-bottom: 1px solid #ddd;
+      position: relative;
+      padding-left: 80px;
+      height: auto;
+      min-height: calc(2em + 12px);
+    }
+    tr:last-child > td:last-child {
+      border-bottom: 0;
+    }
+    
+    td:before {
+      /* Now like a table header */
+      position: absolute;
+      /* Top/left values mimic padding */
+      top: 6px;
+      left: 6px;
+      width: 80px;
+      box-sizing: border-box;
+      padding-right: 10px;
+      white-space: nowrap;
+    }
+  }
+}

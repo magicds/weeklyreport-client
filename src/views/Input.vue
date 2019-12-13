@@ -40,12 +40,10 @@
           </ul>
         </alert>
 
-        <!-- <div class="title">{{currType.text}}</div> -->
         <FormItem :label="currType.text" prop="content">
           <i-input :rows="4" element-id="content-input" placeholder="请输入内容，回车将被自动分割为多条" type="textarea" v-model="data.content"></i-input>
+          <div class="content-info">{{currType.explain}}</div>
         </FormItem>
-
-        <div class="content-info">{{currType.explain}}</div>
 
         <FormItem :label="timeLabel.title" prop="time">
           <InputNumber :max="100" :min="0.1" :step="1" v-model="data.time" style="width:100%"></InputNumber>
@@ -57,13 +55,13 @@
 
     <fieldset>
       <legend>事项列表</legend>
-      <i-table :columns="tableColumns" :data="reportList"></i-table>
+      <i-table :columns="tableColumns" :data="reportList" class="table-support-mobile input-temp-table"></i-table>
     </fieldset>
 
     <fieldset>
       <legend>汇总</legend>
 
-      <table class="table table-bordered vertical-middle">
+      <table class="table table-bordered vertical-middle table-support-mobile input-summary-table">
         <thead>
           <tr>
             <th style="width:120px;">姓名</th>
@@ -463,6 +461,48 @@ legend {
   display: flex;
   span + span {
     margin-left: 24px;
+  }
+}
+</style>
+
+<style lang="scss">
+.table-support-mobile {
+  &.input-temp-table {
+    td > * {
+      padding-top: 6px;
+    }
+    td:nth-of-type(1):before {
+      content: '工作内容';
+    }
+    td:nth-of-type(2):before {
+      content: '类型';
+    }
+    td:nth-of-type(3):before {
+      content: '时间';
+    }
+    td:nth-of-type(4):before {
+      content: '操作';
+    }
+  }
+  &.input-summary-table {
+    td:nth-of-type(1):before {
+      content: '姓名';
+    }
+    td:nth-of-type(2):before {
+      content: '工作内容';
+    }
+    td:nth-of-type(3):before {
+      content: '任务耗时';
+    }
+    td:nth-of-type(4):before {
+      content: '学习耗时';
+    }
+    td:nth-of-type(5):before {
+      content: '沟通耗时';
+    }
+    td:nth-of-type(5):before {
+      content: '其他';
+    }
   }
 }
 </style>
