@@ -14,7 +14,7 @@ export default {
       return this.$store.state.userData;
     },
     extItems() {
-      if (this.user.role >= 100) {
+      if (this.user.role >= 10) {
         return [{ id: 'verify', name: 'verify', text: '未验证用户审核' }];
       } else {
         return [];
