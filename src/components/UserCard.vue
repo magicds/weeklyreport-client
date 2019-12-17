@@ -35,7 +35,7 @@
         <Icon class="mr-s" type="ios-mail"></Icon>
         <p class="email-block">
           {{user.email}}
-          <Button class="reset-pwd-btn" @click="resetPwd(user.email)">重置密码</Button>
+          <Button size="small" class="reset-pwd-btn" @click="resetPwd(user.email)">重置密码</Button>
         </p>
       </div>
 
@@ -174,7 +174,9 @@ export default {
   .item {
     padding-left: 8px;
     line-height: 28px;
-    height: 28px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
   }
   .detail-title {
     padding-left: 8px;
