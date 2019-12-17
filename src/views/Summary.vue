@@ -14,8 +14,10 @@
         <Button type="primary" :loading="exportLoading" @click="exportData">导出</Button>
       </div>
     </div>
-    <SummaryChart :loading="loading" @click="handleChartClick" :data="filterdList" style="margin-bottom:16px;" />
-    <SummaryTable ref="summaryTable" :loading="loading" :data="filterdList" :weeks="weeks" />
+    <div ref="dataArea">
+      <SummaryChart :loading="loading" @click="handleChartClick" :data="filterdList" style="margin-bottom:16px;" />
+      <SummaryTable ref="summaryTable" :loading="loading" :data="filterdList" :weeks="weeks" />
+    </div>
 
     <Modal title="请选择要显示的人员" v-model="showFilterDialog" okText="过滤" @on-ok="doFilter">
       <Tree :data="treeData" ref="tree" show-checkbox multiple></Tree>
@@ -29,6 +31,7 @@ import SummaryTable from '@/components/SummaryTable';
 import SummaryChart from '@/components/SummaryChart';
 import RangeSelect from '@/components/RangeSelect';
 import scrollTo from '@/mixin/scrollto.js';
+import exportData from '@/util/exportData.js';
 
 const WEEK_MILLISECONDS = 1000 * 60 * 60 * 24 * 7;
 
@@ -337,7 +340,13 @@ export default {
       this.showFilterDialog = false;
     },
     exportData() {
-      alert('即将到来');
+      // alert('即将到来');
+
+      // this.$refs.summaryTable.exportCsv({
+      //   filename: `${this.summaryTitle}.csv`,
+      //   original: false
+      // });
+      exportData(this.$refs.dataArea, this.list, this.summaryTitle);
     },
     handleChartClick(name) {
       console.log(name);

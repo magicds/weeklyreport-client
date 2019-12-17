@@ -1,5 +1,5 @@
 <template>
-  <Table class="summary-table" :columns="weeks > 1 ? column2 : column1" :data="data" :loading="loading" :class="{'show-content': weeks > 1}">
+  <Table ref="table" class="summary-table" :columns="weeks > 1 ? column2 : column1" :data="data" :loading="loading" :class="{'show-content': weeks > 1}">
     <template slot-scope="{ row }" slot="percent">
       <div :style="'color:' + rate2color(row.saturation * 100)">{{row.saturation | toPercent}}</div>
     </template>
@@ -77,7 +77,12 @@ export default {
       })
     };
   },
-  methods: { rate2color }
+  methods: {
+    rate2color,
+    exportCsv(opt) {
+      this.$refs.table.exportCsv(opt);
+    }
+  }
 };
 </script>
 
