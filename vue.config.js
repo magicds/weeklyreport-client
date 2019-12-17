@@ -8,5 +8,12 @@ module.exports = {
     // proxy: {
     //   "^/fe-manage/api": { target: "http://localhost:2222" }
     // }
+  },
+  pwa: {
+    name: '新点前端周报',
+    assetsVersion: new Date().toISOString().split('T')[0],
+    workboxOptions: {
+      importWorkboxFrom: 'local'
+    }
   }
 };

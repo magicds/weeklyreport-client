@@ -466,42 +466,44 @@ legend {
 </style>
 
 <style lang="scss">
-.table-support-mobile {
-  &.input-temp-table {
-    td > * {
-      padding-top: 6px;
+@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+  .table-support-mobile {
+    &.input-temp-table {
+      td > * {
+        padding-top: 6px;
+      }
+      td:nth-of-type(1):before {
+        content: '工作内容';
+      }
+      td:nth-of-type(2):before {
+        content: '类型';
+      }
+      td:nth-of-type(3):before {
+        content: '时间';
+      }
+      td:nth-of-type(4):before {
+        content: '操作';
+      }
     }
-    td:nth-of-type(1):before {
-      content: '工作内容';
-    }
-    td:nth-of-type(2):before {
-      content: '类型';
-    }
-    td:nth-of-type(3):before {
-      content: '时间';
-    }
-    td:nth-of-type(4):before {
-      content: '操作';
-    }
-  }
-  &.input-summary-table {
-    td:nth-of-type(1):before {
-      content: '姓名';
-    }
-    td:nth-of-type(2):before {
-      content: '工作内容';
-    }
-    td:nth-of-type(3):before {
-      content: '任务耗时';
-    }
-    td:nth-of-type(4):before {
-      content: '学习耗时';
-    }
-    td:nth-of-type(5):before {
-      content: '沟通耗时';
-    }
-    td:nth-of-type(5):before {
-      content: '其他';
+    &.input-summary-table {
+      td:nth-of-type(1):before {
+        content: '姓名';
+      }
+      td:nth-of-type(2):before {
+        content: '工作内容';
+      }
+      td:nth-of-type(3):before {
+        content: '任务耗时';
+      }
+      td:nth-of-type(4):before {
+        content: '学习耗时';
+      }
+      td:nth-of-type(5):before {
+        content: '沟通耗时';
+      }
+      td:nth-of-type(6):before {
+        content: '其他';
+      }
     }
   }
 }

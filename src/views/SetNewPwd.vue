@@ -1,5 +1,5 @@
 <template>
-  <div class="reset-pwd-box">
+  <div class="reset-pwd-box" style="margin-top: 20px;">
     <img class="logo" src="../assets/logo.png" />
     <h2 class="reset-pwd-box-title">设置新密码</h2>
     <Form ref="form" :rules="relues" :model="user" @submit.native.prevent>

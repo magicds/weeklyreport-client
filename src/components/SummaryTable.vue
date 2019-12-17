@@ -1,5 +1,5 @@
 <template>
-  <Table ref="table" class="summary-table" :columns="weeks > 1 ? column2 : column1" :data="data" :loading="loading" :class="{'show-content': weeks > 1}">
+  <Table ref="table" class="summary-table table-support-mobile" :columns="weeks > 1 ? column2 : column1" :data="data" :loading="loading" :class="{'multi-weeks': weeks > 1}">
     <template slot-scope="{ row }" slot="percent">
       <div :style="'color:' + rate2color(row.saturation * 100)">{{row.saturation | toPercent}}</div>
     </template>
@@ -102,5 +102,88 @@ export default {
 .summary-column .ivu-table-cell {
   padding-left: 8px;
   padding-right: 8px;
+}
+@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+  .table-support-mobile {
+    &.summary-table {
+      table {
+        width: auto !important;
+      }
+      li {
+        white-space: normal;
+        margin-bottom: 4px;
+      }
+      td > * {
+        padding-top: 6px;
+      }
+      td:nth-of-type(1):before {
+        content: '姓名';
+      }
+      td:nth-of-type(2):before {
+        content: '工作内容';
+      }
+      td:nth-of-type(3):before {
+        content: '任务耗时';
+      }
+      td:nth-of-type(4):before {
+        content: '沟通耗时';
+      }
+      td:nth-of-type(5):before {
+        content: '学习耗时';
+      }
+      td:nth-of-type(6):before {
+        content: '饱和度';
+      }
+      td:nth-of-type(7):before {
+        content: '备注';
+      }
+      &.multi-weeks {
+        td:nth-of-type(1) {
+          // visibility: hidden;
+          &:before {
+            content: '查看详情';
+          }
+          .ivu-table-cell-with-expand {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            opacity: 0;
+          }
+        }
+        td:nth-of-type(2):before {
+          content: '姓名';
+        }
+        td:nth-of-type(3):before {
+          content: '任务耗时';
+        }
+        td:nth-of-type(4):before {
+          content: '沟通耗时';
+        }
+        td:nth-of-type(5):before {
+          content: '学习耗时';
+        }
+        td:nth-of-type(6):before {
+          content: '请假耗时';
+        }
+        td:nth-of-type(7):before {
+          content: '饱和度';
+        }
+        td:nth-of-type(7):before {
+          content: '时间范围';
+        }
+        td:nth-of-type(8):before {
+          content: '备注';
+        }
+        td[colspan].ivu-table-expanded-cell {
+          visibility: visible;
+          &:before {
+            content: '工作内容及请假情况';
+          }
+        }
+      }
+    }
+  }
 }
 </style>

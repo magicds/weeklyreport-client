@@ -52,7 +52,27 @@
       white-space: nowrap;
     }
   }
+
   .reset-pwd-btn {
     opacity: 1 !important;
+  }
+
+  .summary-report-header {
+    flex-wrap: wrap;
+    > * {
+      width: 100%;
+      margin-bottom: 8px;
+      margin-left: 0;
+    }
+    .summary-report-title {
+      order: 10;
+    }
+    .summary-report-action {
+      text-align: left;
+      margin-bottom: 16px;
+      > *:first-child {
+        margin-left: 0;
+      }
+    }
   }
 }
