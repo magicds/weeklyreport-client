@@ -125,7 +125,7 @@ export default {
       this.$router.push('/signup');
     },
     toForgetPwd() {
-      this.$router.push('/restpwd');
+      this.$router.push({ name: 'resetPwd' });
     }
   }
 };
