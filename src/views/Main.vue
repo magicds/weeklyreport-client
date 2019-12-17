@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header :user="user" :ext-items="extItems" :onItemClick="onItemClick" />
-    <router-view></router-view>
+    <router-view></router-view><BackTop></BackTop>
   </div>
 </template>
 

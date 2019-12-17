@@ -14,8 +14,8 @@
         <Button type="primary" :loading="exportLoading" @click="exportData">导出</Button>
       </div>
     </div>
-    <SummaryChart :loading="loading" :data="filterdList" style="margin-bottom:16px;" />
-    <SummaryTable :loading="loading" :data="filterdList" :weeks="weeks" />
+    <SummaryChart :loading="loading" @click="handleChartClick" :data="filterdList" style="margin-bottom:16px;" />
+    <SummaryTable ref="summaryTable" :loading="loading" :data="filterdList" :weeks="weeks" />
 
     <Modal title="请选择要显示的人员" v-model="showFilterDialog" okText="过滤" @on-ok="doFilter">
       <Tree :data="treeData" ref="tree" show-checkbox multiple></Tree>
@@ -28,6 +28,7 @@ import { getWeekStart, getWeekEnd, date2text, getDateByText } from '@/util/date.
 import SummaryTable from '@/components/SummaryTable';
 import SummaryChart from '@/components/SummaryChart';
 import RangeSelect from '@/components/RangeSelect';
+import scrollTo from '@/mixin/scrollto.js';
 
 const WEEK_MILLISECONDS = 1000 * 60 * 60 * 24 * 7;
 
@@ -36,6 +37,7 @@ const LOCAL_KEY = 'HIDDEN_USER_MAP';
 export default {
   name: 'week-summary',
   components: { RangeSelect, SummaryTable, SummaryChart },
+  mixins: [scrollTo],
   data() {
     return {
       loading: false,
@@ -123,6 +125,10 @@ export default {
     } catch (error) {
       console.error(error);
     }
+    if (process.env.NODE_ENV != 'production') {
+      this.dateRange.start = date2text(getWeekStart(new Date() - WEEK_MILLISECONDS));
+      this.dateRange.end = date2text(getWeekEnd(new Date() - WEEK_MILLISECONDS));
+    }
     this.getDeptList();
     this.getData();
   },
@@ -131,18 +137,29 @@ export default {
       this.loading = true;
       return this.$fetch(`api/user/list?dept=${this.targetDept || this.user.dept.id}`).then(res => {
         if (res.code == 200) {
-          this.userList = res.data.map(u => {
-            const extInfo = u.extInfo;
-            return {
-              id: u.id,
-              name: u.name + (extInfo ? `(${extInfo})` : ''),
-              groupId: u.group._id,
-              groupName: u.group.name,
-              deptId: u.dept._id,
-              deptName: u.dept.name,
-              reports: []
-            };
-          });
+          this.userList = res.data
+            .sort((a, b) => {
+              if (a.index === b.index) return 0;
+              return a.index - b.index < 0 ? -1 : 1;
+            })
+            .sort((u1, u2) => {
+              const a = u1.group.index;
+              const b = u2.group.index;
+              if (a === b) return 0;
+              return a - b < 0 ? -1 : 1;
+            })
+            .map(u => {
+              const extInfo = u.extInfo;
+              return {
+                id: u.id,
+                name: u.name + (extInfo ? `(${extInfo})` : ''),
+                groupId: u.group._id,
+                groupName: u.group.name,
+                deptId: u.dept._id,
+                deptName: u.dept.name,
+                reports: []
+              };
+            });
         } else {
           console.error(res.message);
         }
@@ -321,6 +338,19 @@ export default {
     },
     exportData() {
       alert('即将到来');
+    },
+    handleChartClick(name) {
+      console.log(name);
+      const nameEls = this.$refs.summaryTable.$el.querySelectorAll('.summary-column.name');
+      const targetEl = [].slice.call(nameEls).filter(td => td.textContent.indexOf(name) != -1)[0];
+      if (targetEl) {
+        const targetRow = targetEl.closest('.ivu-table-row');
+        this.scrollTo(targetRow);
+        targetRow && targetRow.classList.add('highlight');
+        setTimeout(() => {
+          targetEl.classList.remove('highlight');
+        }, 1000);
+      }
     }
   }
 };
@@ -338,6 +368,11 @@ export default {
   text-align: right;
   > * {
     margin-left: 8px;
+  }
+}
+.ivu-table-row.highlight {
+  td {
+    background: #ebf7ff;
   }
 }
 </style>

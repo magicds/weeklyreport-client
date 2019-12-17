@@ -23,8 +23,6 @@ import 'echarts/lib/component/title';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/markLine';
 
-import rate2color from '@/util/rate2color.js';
-
 function getMax(list) {
   let max = 0;
   let maxIndex = -1;
@@ -52,13 +50,31 @@ export default {
     personOpt() {
       const names = [];
       const rates = [];
+      const standTimes = [];
+      const addTimes = [];
+      const totalTimes = [];
       const userInfoMap = {};
       this.data.forEach(item => {
         names.push(item.name);
         rates.push(item.saturation);
+        totalTimes.push(item.saturationTime);
+
+        const add = item.saturationTime - item.standardTime;
+        if (add > 0) {
+          standTimes.push(item.standardTime);
+          addTimes.push(add);
+        } else {
+          standTimes.push(item.saturationTime);
+          // addTimes.push(0);
+          addTimes.push('-');
+        }
 
         userInfoMap[item.name] = item;
       });
+
+      console.log(names);
+      console.log(standTimes);
+      console.log(addTimes);
 
       // 记录最大值 以备在markline上显示
       const [maxRate, maxIndex] = getMax(rates);
@@ -66,7 +82,7 @@ export default {
 
       return {
         title: {
-          text: '成员工作饱和度',
+          text: '成员工作时长',
           show: true,
           textStyle: {
             color: '#333',
@@ -81,29 +97,27 @@ export default {
           axisPointer: {
             // 坐标轴指示器，坐标轴触发有效
             type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-          },
-          backgroundColor: 'rgba(0,0,0,.8)',
-          formatter: function(data) {
-            let item = data instanceof Array ? data[0] : data;
-            const v = (item.value * 100).toFixed(0);
-            if (item.componentType == 'markLine') {
-              let personName = maxNameMap[item.value];
-              let prefix = personName ? item.name + '<br/>' + personName : item.name;
-              return prefix + ': ' + v + '%';
-            }
-            const { saturationTime, standardTime } = userInfoMap[item.name];
-            const addTime = saturationTime - standardTime;
-            const color = rate2color(v);
-
-            return [
-              // prettier-ignore
-              item.marker + item.name + '<br/>' + item.seriesName + ': ' + v + '%',
-              // prettier-ignore
-              `<br>工作总时间：${saturationTime}h`,
-              `<br> 标准工作时间：${standardTime}h`,
-              addTime > 0 ? `<br> 加班时间：<span style="color:${color};">${addTime}</span>h` : ''
-            ].join('');
           }
+          // formatter: function(data) {
+          //   let item = data instanceof Array ? data[0] : data;
+          //   const v = (item.value * 100).toFixed(0);
+          //   if (item.componentType == 'markLine') {
+          //     let personName = maxNameMap[item.value];
+          //     let prefix = personName ? item.name + '<br/>' + personName : item.name;
+          //     return prefix + ': ' + v + '%';
+          //   }
+          //   const { saturationTime, standardTime } = userInfoMap[item.name];
+          //   const addTime = saturationTime - standardTime;
+
+          //   return [
+          //     // prettier-ignore
+          //     item.marker + item.name + '<br/>' + item.seriesName + ': ' + v + '%',
+          //     // prettier-ignore
+          //     `<br>工作总时间：${saturationTime}h`,
+          //     `<br> 标准工作时间：${standardTime}h`,
+          //     addTime > 0 ? `<br> 加班时间：${addTime}h` : '',
+          //   ].join('');
+          // }
         },
         grid: {
           left: 50,
@@ -127,95 +141,80 @@ export default {
         yAxis: {
           axisLabel: {
             // formatter: '{value * 100} %'
-            formatter: function(value) {
-              return (value * 100).toFixed(0) + '%';
-            }
+            // formatter: function(value) {
+            //   return (value * 100).toFixed(0) + '%';
+            // }
           }
         },
         series: [
           {
-            name: '工作饱和度',
+            name: '基础工作时间',
             type: 'bar',
-            data: rates,
-            markLine: {
-              symbol: ['circle', 'circle'],
-              // symbolSize: [0, 0, 0, 0],
-              data: [
-                {
-                  name: '平均值工作饱和度',
-                  type: 'average',
-                  valueIndex: 1,
-                  valueDim: 'x',
-                  lineStyle: {
-                    type: 'solid'
-                  },
-                  label: {
-                    // position: 'middle',
-                    formatter: function(v) {
-                      return (v.value * 100).toFixed(0) + '%';
-                    }
-                  }
-                },
-                {
-                  name: '最高工作饱和度',
-                  type: 'max',
-                  valueIndex: 1,
-                  lineStyle: {
-                    type: 'dashed'
-                  },
-                  label: {
-                    // position: 'middle',
-                    formatter: function(v) {
-                      return (v.value * 100).toFixed(0) + '%';
-                    }
-                  }
-                }
-              ]
-            },
+            stack: 'total',
+            data: standTimes,
             barMinHeight: 10,
             barMaxWidth: 50,
             label: {
               normal: {
                 show: true,
-                position: 'top',
-                formatter: function(item) {
-                  return (item.data * 100).toFixed(0) + '%';
-                }
+                position: 'insideTop'
+                // formatter: function(item) {
+                //   return (item.data * 100).toFixed(0) + '%';
+                // }
               }
             },
-            itemStyle: {
+            animationDelay: 100,
+            animationDurationUpdate: function(idx) {
+              return idx * 30;
+            }
+          },
+          {
+            name: '加班时间',
+            type: 'bar',
+            stack: 'total',
+            data: addTimes,
+            barMinHeight: 10,
+            barMaxWidth: 50,
+            label: {
               normal: {
-                color: function(item) {
-                  let rate = item.data * 100;
-                  return rate2color(rate);
-                  // if (rate >= 140) {
-                  //   return '#ea644a';
-                  // }
-                  // if (rate > 120) {
-                  //   return '#f1a325';
-                  // }
-                  // if (rate > 90) {
-                  //   return '#38b03f';
-                  // }
-                  // if (rate >= 70) {
-                  //   return '#f1a325';
-                  // } else {
-                  //   return '#ea644a';
-                  // }
-                }
+                show: true,
+                position: 'insideTop'
+                // formatter: function(item) {
+                //   return (item.data * 100).toFixed(0) + '%';
+                // }
               }
             },
-            // animationDelay: 100,
-            animationDelay: function(idx) {
-              return 100 + idx * 50;
+            animationDelay: 100 + 30 * names.length,
+            animationDurationUpdate: function(idx) {
+              return idx * 30;
             }
           }
+          // ,
+          // {
+          //   name: '3',
+          //   type: 'bar',
+          //   data: totalTimes,
+          //   barMinHeight: 10,
+          //   barMaxWidth: 50,
+          //   label: {
+          //     normal: {
+          //       show: true,
+          //       position: 'top',
+          //       // formatter: function(item) {
+          //       //   return (item.data * 100).toFixed(0) + '%';
+          //       // }
+          //     }
+          //   },
+          //   animationDelay: 100,
+          //   animationDurationUpdate: function(idx) {
+          //     return idx * 30;
+          //   }
+          // }
         ],
         animationEasing: 'easeOut',
-        animationDuration: 300,
-        // animationDelayUpdate: function(idx) {
-        //   return idx * 15;
-        // }
+        animationDelayUpdate: function(idx) {
+          return idx * 15;
+        }
       };
     }
   },

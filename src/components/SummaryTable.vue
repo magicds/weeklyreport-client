@@ -1,6 +1,8 @@
 <template>
   <Table class="summary-table" :columns="weeks > 1 ? column2 : column1" :data="data" :loading="loading" :class="{'show-content': weeks > 1}">
-    <template slot-scope="{ row }" slot="percent">{{row.saturation | toPercent}}</template>
+    <template slot-scope="{ row }" slot="percent">
+      <div :style="'color:' + rate2color(row.saturation * 100)">{{row.saturation | toPercent}}</div>
+    </template>
     <template slot-scope="{ row }" slot="workList">
       <ListDisplay :data="row.workList" />
     </template>
@@ -13,6 +15,9 @@
 <script>
 import ExpandRow from './ExpandRow';
 import ListDisplay from './ListDisplay';
+
+import rate2color from '@/util/rate2color.js';
+
 export default {
   name: 'summary-table',
   components: {
@@ -72,18 +77,7 @@ export default {
       })
     };
   },
-  computed: {
-    contentColums() {
-      return this.allColumns.filter(c => {
-        return c.key != 'leaveTime' || c.key != 'weekRange';
-      });
-    },
-    summaryColums() {
-      return this.allColumns.filter(c => {
-        return c.key != 'workList' || c.key != 'leaveList';
-      });
-    }
-  }
+  methods: { rate2color }
 };
 </script>
 
