@@ -283,6 +283,9 @@ export default {
         }
 
         Object.keys(summaryReport).forEach(k => {
+          if (/Time$/.test(k)) {
+            summaryReport[k] = parseInt(summaryReport[k].toFixed(0), 10);
+          }
           u[k] = summaryReport[k];
         });
         if (u.startDate && u.endDate) {
