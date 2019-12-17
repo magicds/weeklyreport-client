@@ -1,5 +1,5 @@
 <template>
-  <i-form ref="signinForm" :model="editData" :rules="userRule" :label-width="80">
+  <Form ref="signinForm" :model="editData" :rules="userRule" :label-width="80">
     <FormItem prop="email" label="邮箱">
       <i-input type="text" readonly v-model="editData.email" placeholder="请输入邮箱">
         <Icon type="ios-mail-outline" slot="prepend"></Icon>
@@ -37,7 +37,7 @@
         </Radio>
       </RadioGroup>
     </FormItem>
-  </i-form>
+  </Form>
 </template>
 
 <script>

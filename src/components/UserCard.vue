@@ -11,12 +11,12 @@
       <div class="detail-title">
         <span>详细信息</span>
         <span class="user-action">
-          <i-button @click="startEdit(user)" class="edit-btn btn-text" type="text">
+          <Button @click="startEdit(user)" class="edit-btn btn-text" type="text">
             <Icon class="mr-s" type="ios-create"></Icon>编辑
-          </i-button>
-          <i-button :loading="loading" @click="deleteUser(user.id)" class="edit-btn btn-text" type="text" v-if="showDelete">
+          </Button>
+          <Button :loading="loading" @click="deleteUser(user.id)" class="edit-btn btn-text" type="text" v-if="showDelete">
             <Icon class="mr-s" type="ios-trash-outline"></Icon>删除
-          </i-button>
+          </Button>
         </span>
       </div>
       <hr class="hr" />

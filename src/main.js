@@ -8,7 +8,71 @@ import store from './store';
 import fetchData from './util/fetch';
 import './style/style.scss';
 
-Vue.use(ViewUI);
+// Vue.use(ViewUI);
+
+import {
+  Button,
+  ButtonGroup,
+  Table,
+  Input,
+  InputNumber,
+  Form,
+  FormItem,
+  Select,
+  Option,
+  OptionGroup,
+  DatePicker,
+  Tag,
+  Icon,
+  Card,
+  Row,
+  Col,
+  BackTop,
+  Avatar,
+  Alert,
+  Tree,
+  Radio,
+  RadioGroup,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  Modal,
+  Message
+} from 'view-design';
+
+Vue.component('Button', Button);
+Vue.component('ButtonGroup', ButtonGroup);
+Vue.component('Table', Table);
+Vue.component('Input', Input);
+Vue.component('i-input', Input);
+Vue.component('InputNumber', InputNumber);
+Vue.component('Form', Form);
+Vue.component('FormItem', FormItem);
+Vue.component('Select', Select);
+Vue.component('i-select', Select);
+Vue.component('Option', Option);
+Vue.component('i-option', Option);
+Vue.component('OptionGroup', OptionGroup);
+Vue.component('DatePicker', DatePicker);
+Vue.component('Tag', Tag);
+Vue.component('Icon', Icon);
+Vue.component('Card', Card);
+Vue.component('Row', Row);
+Vue.component('Col', Col);
+Vue.component('i-col', Col);
+Vue.component('BackTop', BackTop);
+Vue.component('Avatar', Avatar);
+Vue.component('Alert', Alert);
+Vue.component('Tree', Tree);
+Vue.component('Radio', Radio);
+Vue.component('RadioGroup', RadioGroup);
+Vue.component('Dropdown', Dropdown);
+Vue.component('DropdownMenu', DropdownMenu);
+Vue.component('DropdownItem', DropdownItem);
+Vue.component('Modal', Modal);
+
+Vue.prototype.$Message = Message;
+Vue.prototype.$Modal = Modal;
 
 Vue.config.productionTip = false;
 Vue.prototype.$fetch = fetchData;

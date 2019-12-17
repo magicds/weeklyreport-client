@@ -229,7 +229,6 @@ export default {
     rangeType(v) {
       if (v == 'week') return;
       if (v == 'year') {
-        debugger;
         if (!/^\d{4}$/.test(this.rangeValue)) {
           this.rangeValue = this.yearList[0];
         }

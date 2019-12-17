@@ -4,7 +4,7 @@
       <p>如果您确认下方用户是团队成员，请点击按钮通过验证请求。否则请忽略或删除。</p>
     </Alert>
     <legend class="user-verify-title">未验证成员</legend>
-    <i-table :columns="tableColumns" :data="userList" :loading="loading" no-data-text="暂无未验证用户"></i-table>
+    <Table :columns="tableColumns" :data="userList" :loading="loading" no-data-text="暂无未验证用户"></Table>
     <legend class="user-verify-title">验证记录</legend>
     <div class="user-verify-logs">
       <ul v-if="logsData.length">

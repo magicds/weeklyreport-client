@@ -2,18 +2,18 @@
   <div class="reset-pwd-box" style="margin-top: 30px">
     <img class="logo" src="../assets/logo.png" />
     <h2 class="reset-pwd-box-title">重置密码</h2>
-    <i-form ref="form" :rules="relues" :model="user" @submit.native.prevent>
+    <Form ref="form" :rules="relues" :model="user" @submit.native.prevent>
       <FormItem prop="email">
         <i-input type="text" v-model="user.email" placeholder="请输入您注册的邮箱"></i-input>
       </FormItem>
       <FormItem class="text-center">
-        <i-button type="primary" @click="resetPwd" :loading="loading" style="width:100%">重置密码</i-button>
+        <Button type="primary" @click="resetPwd" :loading="loading" style="width:100%">重置密码</Button>
       </FormItem>
       <FormItem class="text-center">
         <Button type="text" style="float:left" @click="toLogin">去登录</Button>
         <Button type="text" style="float:right" @click="toSignUp">去注册</Button>
       </FormItem>
-    </i-form>
+    </Form>
   </div>
 </template>
 

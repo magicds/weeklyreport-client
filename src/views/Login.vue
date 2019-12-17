@@ -2,7 +2,7 @@
   <div class="login-box">
     <img class="logo" src="../assets/logo.png" />
     <h2 style="text-align: center; margin-bottom: 20px;">登录</h2>
-    <i-form class="login-form" ref="loginForm" :model="user" :rules="userRule">
+    <Form class="login-form" ref="loginForm" :model="user" :rules="userRule">
       <!-- <FormItem prop="username" label="用户名">
         <i-input type="text" v-model="user.username" placeholder="请输入用户名">
           <Icon type="ios-person-outline" slot="prepend"></Icon>
@@ -24,7 +24,7 @@
         <Button type="text" style="float:right" @click="toForgetPwd">忘记密码</Button>
         <!-- <Button type="primary" @click="handleSubmit('loginForm')">登录</Button> -->
       </FormItem>
-    </i-form>
+    </Form>
   </div>
 </template>
 

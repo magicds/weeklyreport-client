@@ -2,7 +2,7 @@
   <div class="signin-box">
     <img class="logo" src="../assets/logo.png" />
     <h2 style="text-align: center; margin-bottom: 20px;">注册</h2>
-    <i-form ref="signinForm" :model="user" :rules="userRule" :label-width="80">
+    <Form ref="signinForm" :model="user" :rules="userRule" :label-width="80">
       <FormItem prop="email" label="邮箱">
         <i-input type="text" v-model="user.email" placeholder="请输入邮箱">
           <Icon type="ios-mail-outline" slot="prepend"></Icon>
@@ -49,7 +49,7 @@
         <Button type="primary" @click="handleSubmit('signinForm')">注册</Button>
         <Button type="text" @click="toLogin">去登录</Button>
       </FormItem>
-    </i-form>
+    </Form>
   </div>
 </template>
 

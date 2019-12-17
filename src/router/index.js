@@ -3,15 +3,9 @@ import VueRouter from 'vue-router';
 import store from '../store/';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
-import Signup from '../views/Signup.vue';
-// import ResetPwd from '../views/ResetPwd.vue';
 import Main from '../views/Main.vue';
 import Input from '../views/Input.vue';
 import Summary from '../views/Summary.vue';
-import DeptManage from '../views/DeptManage.vue';
-import StaffList from '../views/StaffList.vue';
-import Verify from '../views/Verify.vue';
-import UserInfo from '../views/UserInfo.vue';
 
 Vue.use(VueRouter);
 
@@ -55,18 +49,19 @@ const routes = [
   {
     path: '/signup',
     name: 'signup',
-    component: Signup
+    // component: Signup
+    component: () => import(/* webpackChunkName: "Signup" */ '../views/Signup.vue')
   },
   {
     path: '/resetPwd',
     name: 'resetPwd',
     // component: ResetPwd
-    component:  () => import(/* webpackChunkName: "slide" */ '../views/ResetPwd.vue')
+    component:  () => import(/* webpackChunkName: "resetPwd" */ '../views/ResetPwd.vue')
   },
   {
     path: '/setNewPwd',
     name: 'setNewPwd',
-    component: () => import(/* webpackChunkName: "slide" */ '../views/SetNewPwd.vue')
+    component: () => import(/* webpackChunkName: "resetPwd" */ '../views/SetNewPwd.vue')
   },
   {
     path: '/main',
@@ -86,35 +81,31 @@ const routes = [
       {
         path: 'verify',
         name: 'verify',
-        component: Verify,
+        // component: Verify,
+        component: () => import(/* webpackChunkName: "admin" */ '../views/Verify.vue'),
         beforeEnter: biggerThanGroup
       },
       {
         path: 'dept',
         name: 'dept',
-        component: DeptManage,
+        // component: DeptManage,
+        component: () => import(/* webpackChunkName: "admin" */ '../views/DeptManage.vue'),
         beforeEnter: biggerThenDept
       },
       {
         path: 'person',
         name: 'person',
-        component: StaffList,
+        // component: StaffList,
+        component: () => import(/* webpackChunkName: "admin" */ '../views/StaffList.vue'),
         beforeEnter: biggerThanGroup
       },
       {
         path: 'userinfo',
         name: 'userinfo',
-        component: UserInfo
+        // component: UserInfo
+        component: () => import(/* webpackChunkName: "userInfo" */ '../views/UserInfo.vue')
       }
     ]
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   }
 ];
 

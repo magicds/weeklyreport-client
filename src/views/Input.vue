@@ -22,7 +22,7 @@
       </div>
     </fieldset>
 
-    <i-form :model="data" :rules="relues" label-position="top" ref="form">
+    <Form :model="data" :rules="relues" label-position="top" ref="form">
       <fieldset>
         <legend>工作内容</legend>
 
@@ -51,11 +51,11 @@
 
         <Button @click="addItem" type="primary">添加并重置</Button>
       </fieldset>
-    </i-form>
+    </Form>
 
     <fieldset>
       <legend>事项列表</legend>
-      <i-table :columns="tableColumns" :data="reportList" class="table-support-mobile input-temp-table"></i-table>
+      <Table :columns="tableColumns" :data="reportList" class="table-support-mobile input-temp-table"></Table>
     </fieldset>
 
     <fieldset>

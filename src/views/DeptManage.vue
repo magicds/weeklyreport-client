@@ -184,6 +184,7 @@ export default {
       name = name.trim();
       if (!name) {
         this.$Message.error('部门名称必填！');
+        this.deptEditInfo.show = false;
         return;
       }
 
@@ -200,6 +201,7 @@ export default {
         console.log(res);
         if (res.code !== 200) {
           this.$Message.error('保存失败！' + res.message);
+          this.deptEditInfo.show = false;
           return;
         }
         this.$Message.success('保存成功');
