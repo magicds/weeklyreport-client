@@ -4,7 +4,7 @@ import store from '../store/';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Signup from '../views/Signup.vue';
-import ResetPwd from '../views/ResetPwd.vue';
+// import ResetPwd from '../views/ResetPwd.vue';
 import Main from '../views/Main.vue';
 import Input from '../views/Input.vue';
 import Summary from '../views/Summary.vue';
@@ -16,7 +16,7 @@ import UserInfo from '../views/UserInfo.vue';
 Vue.use(VueRouter);
 
 function anonymityAccess(to) {
-  return ['signup', 'login', 'home', 'resetpwd'].indexOf(to.name) !== -1;
+  return ['signup', 'login', 'home', 'resetPwd', 'setNewPwd'].indexOf(to.name) !== -1;
 }
 function biggerThanGroup(to, from, next) {
   console.log('admin check 1');
@@ -58,9 +58,15 @@ const routes = [
     component: Signup
   },
   {
-    path: '/resetpwd',
+    path: '/resetPwd',
     name: 'resetPwd',
-    component: ResetPwd
+    // component: ResetPwd
+    component:  () => import(/* webpackChunkName: "slide" */ '../views/ResetPwd.vue')
+  },
+  {
+    path: '/setNewPwd',
+    name: 'setNewPwd',
+    component: () => import(/* webpackChunkName: "slide" */ '../views/SetNewPwd.vue')
   },
   {
     path: '/main',

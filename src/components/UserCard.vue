@@ -137,7 +137,17 @@ export default {
       this.$emit('refresh', data);
     },
     resetPwd(email) {
-      alert('即将到来' + email);
+      this.$fetch('api/user/sendResetPwdMail', { email })
+        .then(res => {
+          if (res.code == 200) {
+            this.$Message.success('密码重置邮件发送成功');
+          } else {
+            throw new Error(res.message || res);
+          }
+        })
+        .catch(err => {
+          this.$Message.error(err.message);
+        });
     }
   }
 };
