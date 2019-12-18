@@ -22,7 +22,7 @@
     </FormItem>
     <FormItem prop="group" label="所属小组">
       <Select v-model="editData.group" prefix="ios-people-outline">
-        <Option v-for="item in (deptMap[user.dept] ? deptMap[user.dept].groups: [])" :value="item.id" :key="item.id">{{ item.name }}</Option>
+        <Option v-for="item in (deptMap[editData.dept] ? deptMap[editData.dept].groups: [])" :value="item.id" :key="item.id">{{ item.name }}</Option>
       </Select>
     </FormItem>
     <FormItem prop="gender" label="性别">
