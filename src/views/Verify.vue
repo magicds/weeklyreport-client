@@ -125,7 +125,7 @@ export default {
   methods: {
     getUnVerifyList() {
       const { role } = this.user;
-      const deptQ = role < 1000 ? `&dept=${this.user.dept.id}` : '';
+      const deptQ = role <= 100 ? `&dept=${this.user.dept.id}` : '';
       return this.$fetch('api/user/list?unVerify=true' + deptQ).then(res => {
         if (res.code == 200) {
           return res.data;

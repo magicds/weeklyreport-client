@@ -27,7 +27,7 @@ function biggerThenDept(to, from, next) {
   console.log('admin check 2');
   const user = store.state.userData;
   // next();
-  if (user && user.role >= 10) {
+  if (user && user.role >= 100) {
     
     next();
   } else {

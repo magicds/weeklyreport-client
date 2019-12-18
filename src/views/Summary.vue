@@ -169,7 +169,7 @@ export default {
       });
     },
     getDeptList() {
-      if (this.user.role <= 100) {
+      if (this.user.role < 100) {
         this.deptList = [];
         return;
       }
