@@ -332,20 +332,6 @@ export default {
 </script>
 
 <style lang="scss">
-.dept-manange {
-  padding-bottom: 32px;
-}
-.dept-nav {
-  line-height: 40px;
-  &-item {
-    font-size: 16px;
-    margin-right: 16px;
-    cursor: pointer;
-    &.active {
-      color: #2d8cf0;
-    }
-  }
-}
 .dept-list {
   margin-bottom: 20px;
 }

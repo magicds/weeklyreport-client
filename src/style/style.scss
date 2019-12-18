@@ -29,3 +29,17 @@
   border-bottom: 1px solid #ddd;
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
 }
+.dept-manange {
+  padding-bottom: 32px;
+}
+.dept-nav {
+  line-height: 40px;
+  &-item {
+    font-size: 16px;
+    margin-right: 16px;
+    cursor: pointer;
+    &.active {
+      color: #2d8cf0;
+    }
+  }
+}
