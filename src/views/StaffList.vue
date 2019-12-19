@@ -46,7 +46,15 @@ export default {
   mixins: [scrollTo],
   computed: {
     deptUserTree() {
-      const deptUserTree = JSON.parse(JSON.stringify(this.deptList));
+      let deptUserTree = JSON.parse(JSON.stringify(this.deptList));
+
+      const userData = this.$store.state.userData;
+      const userDeptId = userData.dept.id;
+      const isSuper = userData.role >= 1000;
+      // filter: if user is just dept leader, just show it's own dept
+      if (!isSuper) {
+        deptUserTree = deptUserTree.filter(d => d.id == userDeptId);
+      }
 
       deptUserTree.forEach(dept => {
         const deptLeader = dept.leader ? dept.leader.id : false;
