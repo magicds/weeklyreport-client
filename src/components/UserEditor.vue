@@ -15,13 +15,13 @@
         <Icon type="ios-alert-outline" slot="prepend"></Icon>
       </i-input>
     </FormItem>
-    <FormItem prop="dept" label="所在部门">
-      <Select v-model="editData.dept" prefix="ios-people-outline">
+    <FormItem prop="dept" label="所在部门" >
+      <Select v-model="editData.dept" prefix="ios-people-outline" :disabled="!isAdmin">
         <Option v-for="item in deptList" :value="item.id" :key="item.id">{{ item.name }}</Option>
       </Select>
     </FormItem>
-    <FormItem prop="group" label="所属小组">
-      <Select v-model="editData.group" prefix="ios-people-outline">
+    <FormItem prop="group" label="所属小组" >
+      <Select v-model="editData.group" prefix="ios-people-outline" :disabled="!isAdmin">
         <Option v-for="item in (deptMap[editData.dept] ? deptMap[editData.dept].groups: [])" :value="item.id" :key="item.id">{{ item.name }}</Option>
       </Select>
     </FormItem>
@@ -49,6 +49,10 @@ export default {
       default: () => {
         return {};
       }
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false
     }
     // deptList: {
     //   type: Array,

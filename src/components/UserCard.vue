@@ -46,7 +46,7 @@
     </div>
 
     <Modal title="个人信息修改" :loading="true" v-model="editDialogShow" @on-ok="doSave">
-      <UserEditor v-if="editDialogShow" ref="usereditor" :user="editData" />
+      <UserEditor v-if="editDialogShow" ref="usereditor" :user="editData" :is-admin="isAdmin" />
     </Modal>
   </div>
 </template>
@@ -56,7 +56,8 @@ import UserEditor from './UserEditor';
 
 export default {
   props: {
-    user: Object
+    user: Object,
+    isAdmin: Boolean
   },
   components: { UserEditor },
   data() {

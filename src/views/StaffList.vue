@@ -10,7 +10,7 @@
         <Row :gutter="16" v-if="dept.members && dept.members.length">
           <i-col class="card-wrap" :xl="8" :lg="{span:12}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in dept.members" :key="user.id">
             <Card>
-              <UserCard :user="user" @refresh="getData" />
+              <UserCard :user="user" @refresh="getData" :is-admin="true" />
             </Card>
           </i-col>
         </Row>
