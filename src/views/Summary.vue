@@ -117,25 +117,40 @@ export default {
     }
   },
   mounted() {
-    if (this.user.dept) {
-      this.targetDept = this.user.dept.id;
-    }
-    try {
-      let localData = JSON.parse(localStorage.getItem(LOCAL_KEY + '-' + this.targetDept));
-      if (localData && typeof localData == 'object') {
-        this.hiddenUserIdMap = localData;
-      }
-    } catch (error) {
-      console.error(error);
-    }
     if (process.env.NODE_ENV != 'production') {
       this.dateRange.start = date2text(getWeekStart(new Date() - WEEK_MILLISECONDS));
       this.dateRange.end = date2text(getWeekEnd(new Date() - WEEK_MILLISECONDS));
     }
-    this.getDeptList();
-    this.getData();
+    if (this.user.dept) {
+      this.targetDept = this.user.dept.id;
+      this.restoreLocal();
+      if (this.user.role>=100) {
+        this.getDeptList()
+      }
+      this.getData();
+    } else {
+      // 用户无部门的情况下，取第一个部门来查询
+      this.getDeptList().then(() => {
+        const dept0 = this.deptList[0];
+        if (dept0 && dept0.id) {
+          this.targetDept = dept0.id;
+          this.restoreLocal();
+          this.getData();
+        }
+      });
+    }
   },
   methods: {
+    restoreLocal() {
+      try {
+        let localData = JSON.parse(localStorage.getItem(LOCAL_KEY + '-' + this.targetDept));
+        if (localData && typeof localData == 'object') {
+          this.hiddenUserIdMap = localData;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
     getUserList() {
       this.loading = true;
       return this.$fetch(`api/user/list?dept=${this.targetDept || this.user.dept.id}`).then(res => {
@@ -169,16 +184,25 @@ export default {
       });
     },
     getDeptList() {
-      if (this.user.role < 100) {
-        this.deptList = [];
-        return;
-      }
-      this.$fetch('api/dept/list').then(res => {
-        if (res.code == 200) {
-          this.deptList = res.data;
-        } else {
+      return new Promise((resolve, reject) => {
+        if (this.user.role < 100) {
           this.deptList = [];
+          resolve(this.deptList);
+          return;
         }
+        this.$fetch('api/dept/list')
+          .then(res => {
+            if (res.code == 200) {
+              this.deptList = res.data;
+            } else {
+              this.deptList = [];
+            }
+            resolve(this.deptList);
+          })
+          .catch(err => {
+            console.error(err);
+            resolve([]);
+          });
       });
     },
     getData() {
