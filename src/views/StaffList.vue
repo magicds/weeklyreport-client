@@ -6,20 +6,26 @@
 
     <div class="dept-list" v-if="deptUserTree.length">
       <div class="dept-item" v-for="dept in deptUserTree" :key="dept.id" :data-key="dept.id">
-        <h3 class="dept-name">{{dept.name}}</h3>
-        <Row :gutter="16" v-if="dept.members && dept.members.length">
-          <i-col class="card-wrap" :xl="8" :lg="{span:12}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in dept.members" :key="user.id">
-            <Card>
-              <UserCard :user="user" @refresh="getData" :is-admin="true" />
-            </Card>
-          </i-col>
-        </Row>
+        <h2 class="dept-name">{{dept.name}}</h2>
+        <div v-if="dept.groups.length">
+          <div class="group-item" v-for="group in dept.groups" :key="group.id">
+            <h3 class="group-name">{{group.name}}</h3>
+            <Row :gutter="16" v-if="group.members && group.members.length">
+              <i-col class="card-wrap" :xl="8" :lg="{span:12}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in group.members" :key="user.id">
+                <Card>
+                  <UserCard :user="user" @refresh="getData" :is-admin="true" />
+                </Card>
+              </i-col>
+            </Row>
+            <div class="dept-empty" v-else>此小组暂无成员</div>
+          </div>
+        </div>
         <div class="dept-empty" v-else>此部门暂无成员</div>
       </div>
     </div>
 
     <!-- 游离人员 -->
-    <Row class="other-user-list" :gutter="16" v-if="otherUsers && otherUsers.length">
+    <Row class="other-user-list" :gutter="16" v-if="0 && otherUsers && otherUsers.length">
       <i-col :lg="{span:8}" :xl="8" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in otherUsers" :key="user.id">
         <Card>
           <UserCard :user="user" />
@@ -58,16 +64,30 @@ export default {
 
       deptUserTree.forEach(dept => {
         const deptLeader = dept.leader ? dept.leader.id : false;
-        dept.members = dept.groups
-          .map(group => {
-            const groupLeader = group.leader ? group.leader.id : false;
-            group.members.forEach(user => {
-              user.isDeptLeader = user.id === deptLeader;
-              user.isGroupLeader = user.id === groupLeader;
-            });
-            return group.members;
-          })
-          .flat();
+        dept.groups.forEach(group => {
+          const groupLeader = group.leader ? group.leader.id : false;
+          group.members.forEach(user => {
+            user.isDeptLeader = user.id === deptLeader;
+            user.isGroupLeader = user.id === groupLeader;
+            if (!user.index) user.index = 0;
+            if (user.isDeptLeader) user.index -= 100;
+            if (user.isGroupLeader) user.index -= 10;
+          });
+          group.members.sort((a, b) => {
+            if (a.index == b.index) return 0;
+            return a.index - b.index < 0 ? -1 : 1;
+          });
+        });
+        // dept.members = dept.groups
+        //   .map(group => {
+        //     const groupLeader = group.leader ? group.leader.id : false;
+        //     group.members.forEach(user => {
+        //       user.isDeptLeader = user.id === deptLeader;
+        //       user.isGroupLeader = user.id === groupLeader;
+        //     });
+        //     return group.members;
+        //   })
+        //   .flat();
         console.log(dept.members);
       });
       console.log(deptUserTree);
@@ -113,5 +133,13 @@ export default {
 }
 .card-wrap {
   margin-bottom: 16px;
+}
+</style>
+<style scoped>
+.group-name {
+  font-weight: normal;
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 32px;
 }
 </style>

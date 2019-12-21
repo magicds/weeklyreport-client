@@ -4,8 +4,8 @@ module.exports = {
   transpileDependencies: ['vue-echarts', 'resize-detector'],
   devServer: {
     port: 2221,
-    // proxy: 'http://localhost:2222'
-    proxy: 'http://192.168.201.159'
+    proxy: 'http://localhost:2222'
+    // proxy: 'http://192.168.201.159'
     // proxy: {
     //   "^/fe-manage/api": { target: "http://localhost:2222" }
     // }

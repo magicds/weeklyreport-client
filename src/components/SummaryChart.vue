@@ -10,7 +10,9 @@
     </div>
     <!-- <div ref="person-charts" style="width:100%;height:400px;margin-bottom:16px"></div>
     <div ref="group-charts" style="width:100%;height:300px;"></div>-->
-    <v-chart autoresize :options="personOpt" style="width:100%;height:400px;margin-bottom:16px" @click="handleClick" />
+    <div class="summary-chart-wrap">
+      <v-chart autoresize :options="personOpt" style="width:100%;height:400px;margin-bottom:16px" @click="handleClick" />
+    </div>
     <!-- <v-chart :options="groupOpt" style="width:100%;height:300px;" /> -->
   </div>
 </template>
@@ -114,13 +116,16 @@ export default {
         xAxis: {
           type: 'category',
           // name: '姓名',
-          nameRotate: 10,
+          // nameRotate: 10,
           axisTick: {
             alignWithLabel: true //坐标轴刻度与标签对齐
           },
           axisLabel: {
             interval: 0,
-            rotate: 60
+            rotate: 0,
+            formatter(value) {
+              return value.replace(/\(/, '\n(');
+            }
           },
           data: names
         },
@@ -232,6 +237,10 @@ export default {
 <style>
 .summary-chart {
   position: relative;
+  overflow-x: auto;
+}
+.summary-chart-wrap {
+  min-width: 600px;
 }
 .chart-loading {
   position: absolute;

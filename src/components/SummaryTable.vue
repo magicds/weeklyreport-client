@@ -9,6 +9,10 @@
     <template slot-scope="{ row }" slot="leaveList">
       <ListDisplay :data="row.leaveList" />
     </template>
+    <template slot-scope="{ row }" slot="submitInfo">
+      <span v-if="row.unSubmit" style="color:#ed4014">未提交</span>
+      <span e-else>{{row.submitDate | dateTime}}</span>
+    </template>
   </Table>
 </template>
 
@@ -39,6 +43,12 @@ export default {
       default: () => []
     }
   },
+  filters: {
+    dateTime(v) {
+      if (!v) return '';
+      return v.replace('T', ' ').replace(/\.\d{3}[a-zA-Z]$/,'')
+    }
+  },
   data() {
     return {
       column1: [
@@ -48,7 +58,8 @@ export default {
         { title: '沟通耗时', key: 'communicationTime', sortable: true, width: 100 },
         { title: '学习耗时', key: 'studyTime', sortable: true, width: 100 },
         { title: '饱和度', key: 'saturation', sortable: true, width: 100, slot: 'percent' },
-        { title: '备注', key: 'leaveList', slot: 'leaveList' }
+        { title: '备注', key: 'leaveList', slot: 'leaveList' },
+        { title: '提交时间', key: 'submitDate', slot: 'submitInfo' }
       ].map(c => {
         c.className = 'summary-column ' + (c.key || c.type);
         return c;
@@ -105,6 +116,10 @@ export default {
 }
 @media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
   .table-support-mobile {
+    td:last-child {
+      border-bottom-width: 2px;
+      // border-bottom-style: double;
+    }
     &.summary-table {
       table {
         width: auto !important;
@@ -136,6 +151,9 @@ export default {
       }
       td:nth-of-type(7):before {
         content: '备注';
+      }
+      td:nth-of-type(8):before {
+        content: '提交时间';
       }
       &.multi-weeks {
         td:nth-of-type(1) {

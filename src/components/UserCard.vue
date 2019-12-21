@@ -26,7 +26,7 @@
         <span>{{user.name}}</span>
         <span v-if="user.extInfo">({{user.extInfo}})</span>
         <Tag class="role-tag" color="green" v-if="user.isDeptLeader">部门经理</Tag>
-        <Tag class="role-tag" color="blue" v-if="user.isGroupLeader">组长</Tag>
+        <Tag class="role-tag" color="blue" v-if="!user.isDeptLeader && user.isGroupLeader">组长</Tag>
         <!-- <Tag color="green" v-if="user.isAdmin">管理员</Tag>
         <Tag color="blue" v-if="user.noReport">免填周报</Tag>-->
       </div>

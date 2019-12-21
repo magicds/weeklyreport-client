@@ -7,14 +7,15 @@
       </div>
       <span class="summary-report-title">{{summaryTitle}}</span>
       <div class="summary-report-action">
-        <Select v-model="targetDept" v-if="deptList.length " style="text-align: left; width:80px" @on-change="getData">
+        <Select v-model="targetDept" v-if="deptList.length " style="text-align: left; width:120px" @on-change="getData">
           <Option v-for="item in deptList" :key="item.id" :value="item.id">{{item.name}}</Option>
         </Select>
         <Button :loading="exportLoading" @click="showFilterDialog = true">人员</Button>
         <Button type="primary" :loading="exportLoading" @click="exportData">导出</Button>
       </div>
     </div>
-    <div ref="dataArea">
+    <div ref="dataArea" class="summary-data-area">
+      <h2>{{deptName}}</h2>
       <SummaryChart :loading="loading" @click="handleChartClick" :data="filterdList" style="margin-bottom:16px;" />
       <SummaryTable ref="summaryTable" :loading="loading" :data="filterdList" :weeks="weeks" />
     </div>
@@ -59,6 +60,17 @@ export default {
     };
   },
   computed: {
+    deptName() {
+      if (!this.targetDept) {
+        return this.user.dept.name;
+      }
+      for (let i = 0; i < this.deptList.length; i++) {
+        if (this.deptList[i].id == this.targetDept) {
+          return this.deptList[i].name;
+        }
+      }
+      return '';
+    },
     user() {
       return this.$store.state.userData;
     },
@@ -124,8 +136,8 @@ export default {
     if (this.user.dept) {
       this.targetDept = this.user.dept.id;
       this.restoreLocal();
-      if (this.user.role>=100) {
-        this.getDeptList()
+      if (this.user.role >= 100) {
+        this.getDeptList();
       }
       this.getData();
     } else {
@@ -184,7 +196,7 @@ export default {
       });
     },
     getDeptList() {
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         if (this.user.role < 100) {
           this.deptList = [];
           resolve(this.deptList);
@@ -265,7 +277,9 @@ export default {
 
             saturationTime: 0,
             saturation: 0,
-            standardTime: 40
+            standardTime: 40,
+            unSubmit: true,
+            submitDate: ''
           };
         } else {
           reports.sort((a, b) => {
@@ -322,7 +336,9 @@ export default {
             saturation,
 
             startDate,
-            endDate
+            endDate,
+            unSubmit: false,
+            submitDate: reports[0].meta.updateAt
           };
         }
 
@@ -390,6 +406,12 @@ export default {
 </script>
 
 <style lang="scss">
+.summary-data-area {
+  padding-top: 16px;
+  > h2 {
+    text-align: center;
+  }
+}
 .summary-report-header {
   display: flex;
   justify-content: space-between;
