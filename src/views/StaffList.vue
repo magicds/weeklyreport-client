@@ -7,9 +7,16 @@
     <div class="dept-list" v-if="deptUserTree.length">
       <div class="dept-item" v-for="dept in deptUserTree" :key="dept.id" :data-key="dept.id">
         <h2 class="dept-name">{{dept.name}}</h2>
+        <Row :gutter="16" >
+          <i-col class="card-wrap" :xl="8" :lg="{span:12}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" >
+          <Card v-if="dept.leader && dept.leader.id">
+            <UserCard :user="dept.leader" @refresh="getData" :is-admin="true" />
+          </Card>
+          </i-col>
+        </Row>
         <div v-if="dept.groups.length">
           <div class="group-item" v-for="group in dept.groups" :key="group.id">
-            <h3 class="group-name">{{group.name}}</h3>
+            <!-- <h3 class="group-name">{{group.name}}</h3> -->
             <Row :gutter="16" v-if="group.members && group.members.length">
               <i-col class="card-wrap" :xl="8" :lg="{span:12}" :md="{span:12}" :sm="{span:24}" :xs="{span:24}" v-for="user in group.members" :key="user.id">
                 <Card>
@@ -63,6 +70,7 @@ export default {
       }
 
       deptUserTree.forEach(dept => {
+        
         const deptLeader = dept.leader ? dept.leader.id : false;
         dept.groups.forEach(group => {
           const groupLeader = group.leader ? group.leader.id : false;
@@ -72,11 +80,15 @@ export default {
             if (!user.index) user.index = 0;
             if (user.isDeptLeader) user.index -= 100;
             if (user.isGroupLeader) user.index -= 10;
+            if (user.isDeptLeader) {
+              dept.leader = user;
+            }
           });
           group.members.sort((a, b) => {
             if (a.index == b.index) return 0;
             return a.index - b.index < 0 ? -1 : 1;
           });
+          group.members = group.members.filter(u => !u.isDeptLeader);
         });
         // dept.members = dept.groups
         //   .map(group => {

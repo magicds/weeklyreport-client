@@ -37,7 +37,8 @@ import {
   DropdownMenu,
   DropdownItem,
   Modal,
-  Message
+  Message,
+  Notice
 } from 'view-design';
 
 Vue.component('Button', Button);
@@ -73,6 +74,8 @@ Vue.component('Modal', Modal);
 
 Vue.prototype.$Message = Message;
 Vue.prototype.$Modal = Modal;
+Vue.prototype.$Notice = Notice;
+window.iViewNotice = Notice;
 
 Vue.config.productionTip = false;
 Vue.prototype.$fetch = fetchData;

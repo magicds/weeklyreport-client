@@ -58,8 +58,8 @@ export default {
         { title: '沟通耗时', key: 'communicationTime', sortable: true, width: 100 },
         { title: '学习耗时', key: 'studyTime', sortable: true, width: 100 },
         { title: '饱和度', key: 'saturation', sortable: true, width: 100, slot: 'percent' },
-        { title: '备注', key: 'leaveList', slot: 'leaveList' },
-        { title: '提交时间', key: 'submitDate', slot: 'submitInfo' }
+        { title: '备注', key: 'leaveList', slot: 'leaveList', width: 200 },
+        { title: '提交时间', key: 'submitDate', slot: 'submitInfo', width: 90 }
       ].map(c => {
         c.className = 'summary-column ' + (c.key || c.type);
         return c;

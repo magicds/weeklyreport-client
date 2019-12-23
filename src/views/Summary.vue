@@ -133,7 +133,7 @@ export default {
       this.dateRange.start = date2text(getWeekStart(new Date() - WEEK_MILLISECONDS));
       this.dateRange.end = date2text(getWeekEnd(new Date() - WEEK_MILLISECONDS));
     }
-    if (this.user.dept) {
+    if (this.user.dept && this.user.dept.id) {
       this.targetDept = this.user.dept.id;
       this.restoreLocal();
       if (this.user.role >= 100) {
