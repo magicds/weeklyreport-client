@@ -21,6 +21,7 @@ import ExpandRow from './ExpandRow';
 import ListDisplay from './ListDisplay';
 
 import rate2color from '@/util/rate2color.js';
+import {date2text} from '@/util/date.js';
 
 export default {
   name: 'summary-table',
@@ -46,7 +47,8 @@ export default {
   filters: {
     dateTime(v) {
       if (!v) return '';
-      return v.replace('T', ' ').replace(/\.\d{3}[a-zA-Z]$/,'')
+      const d = new Date(v);
+      return date2text(d, true);
     }
   },
   data() {
