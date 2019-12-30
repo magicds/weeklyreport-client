@@ -168,6 +168,18 @@ export default {
       return this.$fetch(`api/user/list?dept=${this.targetDept || this.user.dept.id}`).then(res => {
         if (res.code == 200) {
           this.userList = res.data
+            .map(u => {
+              if (u.index === undefined) {
+                u.index = 0;
+              }
+              if (u.dept && u.dept.leader == u.id) {
+                u.index -= 100;
+              } 
+              if (u.group && u.group.leader == u.id) {
+                u.index -= 10;
+              }
+              return u;
+            })
             .sort((a, b) => {
               if (a.index === b.index) return 0;
               return a.index - b.index < 0 ? -1 : 1;
