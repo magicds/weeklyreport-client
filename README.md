@@ -1,4 +1,4 @@
-# team-manage
+# weeklyreport-client
 
 ## Project setup
 ```
